@@ -57,6 +57,7 @@ def getStageFile():
     print(diff_list)
 
 
+
 def main():
     stageFile = getStageFile()
     with open("regex.json")                 as f: regex_api = json.load(f)
