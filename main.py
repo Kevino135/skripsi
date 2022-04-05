@@ -1,31 +1,7 @@
 import re
-import scipy
-from scipy.stats import entropy
-from collections import Counter
+import os
 import json
-
-
-def estimate_shannon_entropy(dna_sequence):
-    bases = Counter([tmp_base for tmp_base in dna_sequence])
-    # print(bases)
-    
-    # define distribution
-    dist = [x/sum(bases.values()) for x in bases.values()]
-    # print(dist)
-
-    # use scipy to calculate entropy
-    entropy_value = entropy(dist, base=2)
-
-    return entropy_value
-
-
-def test():
-    st = """games play here
-asd play hala
-"""
-    regex = r"\b\w{4}\b"
-    rg = re.findall(regex, string)
-    print(rg)
+import git
 
 
 def isPassword(data):
@@ -75,18 +51,27 @@ def isCredentials(regex_api, data):
     # HW => after each match, remove the string from data so it will not read the same string
 
 
+def getStageFile():
+    repo = git.Repo()
+    diff_list = repo.head.commit.diff()
+    print(diff_list)
+
+
 def main():
-    # checkPackage()
-    # test()
+    stageFile = getStageFile()
     with open("regex.json")                 as f: regex_api = json.load(f)
-    with open("sampleFile/test.py")    as f: data = f.read()
 
-    print("[+] Password Check:")
-    print(isPassword(data))
-    print("\n")
 
-    print("[+] Api Creds Check:")
-    print(isCredentials(regex_api, data))
+
+    # with open("sampleFile/test.py")    as f: data = f.read()
+
+
+    # print("[+] Password Check:")
+    # print(isPassword(data))
+    # print("\n")
+
+    # print("[+] Api Creds Check:")
+    # print(isCredentials(regex_api, data))
 
 if __name__ == '__main__':
     main()
