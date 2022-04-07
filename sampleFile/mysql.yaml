@@ -2,7 +2,7 @@ server:
     port: ":8080"
 
 database:
-    aurora: "Phars:d3v3l0@tcp(34.87.44.167:3306)/q_love?parseTime=true"
+    aura: "Phars:d3v3l0@tcp(34.187.44.17:3306)/q_love?parseTime=true"
 
 api:
     auth: "https://staging-api.travel.id/auth"
@@ -11,3 +11,4 @@ swagger:
     host: "localhost:8080"
     schemes:
         - http
+        

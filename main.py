@@ -44,6 +44,8 @@ def isCredentials(regex_creds, read_file, read_file_lines):
     
             # assign issue if exists
             for m in match:
+                m = m.strip()
+                
                 clean_match["issue " + str(count_issue)] = dict()
                 clean_match["issue " + str(count_issue)]["type"] = regex_type
                 clean_match["issue " + str(count_issue)]["match"] = m
@@ -100,10 +102,10 @@ def main():
     # read file per line and whole file
     read_file_lines, read_file = readModifiedFile(modified_files)
 
-    # print("[+] Api Creds Check:")
-    # checkCredentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
-    # for k, v in checkCredentials.items():
-    #     print(k, v, "\n")
+    print("[+] Api Creds Check:")
+    checkCredentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
+    for k, v in checkCredentials.items():
+        print(k, v, "\n")
     
     print("[+] Password Check:")
     # print(isPassword(data))

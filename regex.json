@@ -6,7 +6,8 @@
     "PGP private key block": "-----BEGIN PGP PRIVATE KEY BLOCK-----[A-Za-z\/+=\n0-9]+-----BEGIN PGP PRIVATE KEY BLOCK-----",
     "SSL/TLS Certificate": "-----BEGIN CERTIFICATE-----[A-Za-z\/+=\n0-9]+-----END CERTIFICATE-----",
     
-    "MySQL Connection String": "\".*:.*@tcp\\([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:[0-9]{1,6}\\)\/.*\"",
+    "MySQL Connection String": ".*\".*:.*@tcp\\([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:[0-9]{1,6}\\)\/.*\"",
+    "SQL Server Connection String": ".*\"sqlserver:\/\/.*:.*@[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:[0-9]{1,6}.*\"",
 
     "Artifactory API Token": "(?:\\s|=|:|\"|^)AKC[a-zA-Z0-9]{10,}",
     "Artifactory Password": "(?:\\s|=|:|\"|^)AP[\\dABCDEF][a-zA-Z0-9]{8,}",
