@@ -5,7 +5,7 @@ from tabnanny import check
 import git
 
 
-def isPassword(data):
+def isPassword(read_file, read_file_lines, count_issue):
     wordlist = [
         "password",
         "passwd",
@@ -15,8 +15,32 @@ def isPassword(data):
         "pw"
     ]
 
-    regex_variable = '.*\s:?={1,}\s.*'
-    dirty_match = re.findall(regex_variable, data)
+    regex_password = '.*({}).*'.format("|".join(wordlist))
+    print(read_file)
+    regex = re.compile(regex_password)
+
+    clean_match = dict()
+    for file, vals in read_file.items():
+        match = regex.findall(vals)
+        print(match)
+        # assign issue if exists
+        for m in match:
+            m = m.strip()
+
+            clean_match["issue " + str(count_issue)] = dict()
+            clean_match["issue " + str(count_issue)]["type"] = "Password"
+            clean_match["issue " + str(count_issue)]["match"] = m
+            clean_match["issue " + str(count_issue)]["file"] = file
+            
+            # get line number
+            first = read_file_lines[file].index(m) + 1
+            clean_match["issue " + str(count_issue)]["line"] = str(first)
+
+            count_issue += 1
+
+    return clean_match, count_issue
+    
+    dirty_match = re.findall(regex_variable, read_file)
     dirty_match = [x.replace("\t", "") for x in dirty_match]
 
     clean_match = list()
@@ -45,7 +69,7 @@ def isCredentials(regex_creds, read_file, read_file_lines):
             # assign issue if exists
             for m in match:
                 m = m.strip()
-                
+
                 clean_match["issue " + str(count_issue)] = dict()
                 clean_match["issue " + str(count_issue)]["type"] = regex_type
                 clean_match["issue " + str(count_issue)]["match"] = m
@@ -102,13 +126,13 @@ def main():
     # read file per line and whole file
     read_file_lines, read_file = readModifiedFile(modified_files)
 
-    print("[+] Api Creds Check:")
+    # print("[+] Api Creds Check:")
     checkCredentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
-    for k, v in checkCredentials.items():
-        print(k, v, "\n")
+    # for k, v in checkCredentials.items():
+    #     print(k, v, "\n")
     
     print("[+] Password Check:")
-    # print(isPassword(data))
+    checkPassword = isPassword(read_file, read_file_lines, count_issue)
     # print("\n")
 
 
