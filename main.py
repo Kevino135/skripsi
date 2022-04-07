@@ -5,6 +5,59 @@ from tabnanny import check
 import git
 
 
+class colors:
+    reset = "\033[0m"
+
+    # Black
+    fgBlack = "\033[30m"
+    fgBrightBlack = "\033[30;1m"
+    bgBlack = "\033[40m"
+    bgBrightBlack = "\033[40;1m"
+
+    # Red
+    fgRed = "\033[31m"
+    fgBrightRed = "\033[31;1m"
+    bgRed = "\033[41m"
+    bgBrightRed = "\033[41;1m"
+
+    # Green
+    fgGreen = "\033[32m"
+    fgBrightGreen = "\033[32;1m"
+    bgGreen = "\033[42m"
+    bgBrightGreen = "\033[42;1m"
+
+    # Yellow
+    fgYellow = "\033[33m"
+    fgBrightYellow = "\033[33;1m"
+    bgYellow = "\033[43m"
+    bgBrightYellow = "\033[43;1m"
+
+    # Blue
+    fgBlue = "\033[34m"
+    fgBrightBlue = "\033[34;1m"
+    bgBlue = "\033[44m"
+    bgBrightBlue = "\033[44;1m"
+
+    # Magenta
+    fgMagenta = "\033[35m"
+    fgBrightMagenta = "\033[35;1m"
+    bgMagenta = "\033[45m"
+    bgBrightMagenta = "\033[45;1m"
+
+    # Cyan
+    fgCyan = "\033[36m"
+    fgBrightCyan = "\033[36;1m"
+    bgCyan = "\033[46m"
+    bgBrightCyan = "\033[46;1m"
+
+    # White
+    fgWhite = "\033[37m"
+    fgBrightWhite = "\033[37;1m"
+    bgWhite = "\033[47m"
+    bgBrightWhite = "\033[47;1m"
+
+
+
 def isPassword(read_file, read_file_lines, count_issue):
     wordlist = [
         "password",
@@ -15,14 +68,12 @@ def isPassword(read_file, read_file_lines, count_issue):
         "pw"
     ]
 
-    regex_password = '.*({}).*'.format("|".join(wordlist))
-    print(read_file)
-    regex = re.compile(regex_password)
+    regex_password = ".*{}.*".format(".*|.*".join(wordlist))
+    regex = re.compile(regex_password, re.IGNORECASE)
 
     clean_match = dict()
     for file, vals in read_file.items():
         match = regex.findall(vals)
-        print(match)
         # assign issue if exists
         for m in match:
             m = m.strip()
@@ -38,20 +89,6 @@ def isPassword(read_file, read_file_lines, count_issue):
 
             count_issue += 1
 
-    return clean_match, count_issue
-    
-    dirty_match = re.findall(regex_variable, read_file)
-    dirty_match = [x.replace("\t", "") for x in dirty_match]
-
-    clean_match = list()
-    for variable in dirty_match:
-        for word in wordlist:
-            if word in variable:
-                clean_match.append(variable)
-                break
-
-    if len(clean_match) == 0:
-        return "No Password Found"
     return clean_match
 
 
@@ -111,9 +148,21 @@ def readModifiedFile(modified_files):
 
 def getModifiedFile():
     repo = git.Repo()
-    diff_list = repo.git.diff('HEAD', name_only=True)
+    diff_list = repo.git.diff('HEAD', name_only=True, cached=True)
     
     return diff_list.split('\n')
+
+
+def printOut(final_res):
+    for issue, details in final_res.items():
+        print(colors.fgBrightBlue + issue.capitalize() + colors.reset)
+        
+        for key, values in details.items():
+            if key == "match":
+                print("%-12s : %s%-2s%s" % (key.capitalize(), colors.fgBrightGreen, values, colors.reset))
+            else:
+                print("%-12s : %-2s" % (key.capitalize(), values))
+        print("\n")
 
 
 def main():
@@ -126,14 +175,19 @@ def main():
     # read file per line and whole file
     read_file_lines, read_file = readModifiedFile(modified_files)
 
-    # print("[+] Api Creds Check:")
+    # check creds such as api, token, private key, etc
     checkCredentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
-    # for k, v in checkCredentials.items():
-    #     print(k, v, "\n")
-    
-    print("[+] Password Check:")
+
+    # check creds such as password
     checkPassword = isPassword(read_file, read_file_lines, count_issue)
-    # print("\n")
+
+    # merge dict
+    final_res = {**checkCredentials, **checkPassword}
+    print("\n")
+
+    # print
+    printOut(final_res)
+
 
 
 

@@ -10,5 +10,4 @@ api:
 swagger:
     host: "localhost:8080"
     schemes:
-        - http
-        
+        - http 
