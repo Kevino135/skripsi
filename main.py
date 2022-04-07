@@ -30,6 +30,7 @@ def isPassword(data):
         return "No Password Found"
     return clean_match
 
+
 def isCredentials(regex_creds, read_file, read_file_lines):
     count_issue = 1
     clean_match = dict()
@@ -49,19 +50,17 @@ def isCredentials(regex_creds, read_file, read_file_lines):
                 clean_match["issue " + str(count_issue)]["file"] = file
                 
                 # get line number
-                if "private" in regex_type:
+                if "private" in regex_type.lower() or "certificate" in regex_type.lower():
                     header = m.split("\n")[1]
                     first = (read_file_lines[file].index(header) + 1) - 1
                     last = first + len(m.split("\n")) - 1
                     clean_match["issue " + str(count_issue)]["line"] = f"{first} - {last}"
                 else:
-                    first = (read_file_lines[file].index(m) + 1) - 1
+                    first = read_file_lines[file].index(m) + 1
                     clean_match["issue " + str(count_issue)]["line"] = str(first)
 
                 count_issue += 1
 
-    for k, v in clean_match.items():
-        print(k, v, "\n")
     return clean_match, count_issue
 
 
@@ -101,10 +100,12 @@ def main():
     # read file per line and whole file
     read_file_lines, read_file = readModifiedFile(modified_files)
 
-    print("[+] Api Creds Check:")
-    checkCredentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
-    # print(checkCredentials)
-    # print("[+] Password Check:")
+    # print("[+] Api Creds Check:")
+    # checkCredentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
+    # for k, v in checkCredentials.items():
+    #     print(k, v, "\n")
+    
+    print("[+] Password Check:")
     # print(isPassword(data))
     # print("\n")
 
