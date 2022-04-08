@@ -68,6 +68,7 @@ def getPasswordComplexity(password):
     return strength
 
 
+# filter string -> only get password
 def getPasswordOnly(wordlist, m_precise):
     regex_password_acc = ".*({})[\s=(:\'\"<>]*([a-zA-Z0-9_\!\#,@\/\\\:\;.\|\$=\+\-\*\^\?\&\~\%]*)[\')><\"]*".format("|".join(wordlist))
     rematch = re.findall(regex_password_acc, m_precise, re.IGNORECASE)
@@ -88,12 +89,14 @@ def isPassword(read_file, read_file_lines, count_issue):
         "pw"
     ]
 
+    # every string contains password in one line
     regex_password = ".*{}.*".format(".*|.*".join(wordlist))
     regex = re.compile(regex_password, re.IGNORECASE)
 
     clean_match = dict()
     for file, vals in read_file.items():
         match = regex.findall(vals)
+        
         # assign issue if exists
         for m in match:
             m_precise = m.strip()
@@ -212,8 +215,6 @@ def main():
 
     # print
     printOut(final_res)
-
-
 
 
 if __name__ == '__main__':

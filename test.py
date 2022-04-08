@@ -21,8 +21,10 @@ string_list = [
     'checkli',
     'andra',
     "password_1",
-    '7erc2rrrS*2018"'
+    '7erc2rrrS*2018"',
+    'os.getenv("PASSWORD")'
 ]
+
 
 # for string in string_list:
 #     match = regex.findall(string)
