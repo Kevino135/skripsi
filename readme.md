@@ -1,0 +1,2 @@
+- scan compressed file/folder
+- encode creds if force commit
