@@ -69,7 +69,7 @@ def getPasswordComplexity(password):
 
 
 def getPasswordOnly(wordlist, m_precise):
-    regex_password_acc = ".*({})[\s=(:\'\"<>]*([a-zA-Z0-9_\!\#,@\/\\\:\;.\|\`\$=\+\-\*\^\?\&\~\%]*)[\')><\"]*".format("|".join(wordlist))
+    regex_password_acc = ".*({})[\s=(:\'\"<>]*([a-zA-Z0-9_\!\#,@\/\\\:\;.\|\$=\+\-\*\^\?\&\~\%]*)[\')><\"]*".format("|".join(wordlist))
     rematch = re.findall(regex_password_acc, m_precise, re.IGNORECASE)
 
     return rematch[0][1]
