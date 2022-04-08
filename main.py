@@ -60,18 +60,26 @@ class colors:
     bgBrightWhite = "\033[47;1m"
 
 
-def isPasswordAccurate():
+def getPasswordComplexity(password):
+    # meter = passwordmeter.Meter(settings=dict(factors='length,charmix'))
+    meter = passwordmeter.Meter()
+    strength = meter.test(password)[0]
+
+    return strength
 
 
 def getPasswordOnly(wordlist, m_precise):
     regex_password_acc = ".*({})[\s=(:\'\"<>]*([a-zA-Z0-9_\!\#,@\/\\\:\;.\|\`\$=\+\-\*\^\?\&\~\%]*)[\')><\"]*".format("|".join(wordlist))
     rematch = re.findall(regex_password_acc, m_precise, re.IGNORECASE)
 
-    return rematch
+    return rematch[0][1]
 
 
 def isPassword(read_file, read_file_lines, count_issue):
     wordlist = [
+        "secret",
+
+        "pgpassword",
         "password",
         "passwd",
         "pswrd",
@@ -90,19 +98,21 @@ def isPassword(read_file, read_file_lines, count_issue):
         for m in match:
             m_precise = m.strip()
 
-            rematch = getPasswordOnly(wordlist, m_precise)
-            print(rematch)
+            rematch             = getPasswordOnly(wordlist, m_precise)
+            password_complexity = getPasswordComplexity(rematch)
+            # print(password_complexity)
 
-            clean_match["issue " + str(count_issue)] = dict()
-            clean_match["issue " + str(count_issue)]["type"] = "Password"
-            clean_match["issue " + str(count_issue)]["match"] = m_precise
-            clean_match["issue " + str(count_issue)]["file"] = file
-            
-            # get line number
-            first = read_file_lines[file].index(m) + 1
-            clean_match["issue " + str(count_issue)]["line"] = str(first)
+            if password_complexity >= 0.5:
+                clean_match["issue " + str(count_issue)] = dict()
+                clean_match["issue " + str(count_issue)]["type"] = "Password"
+                clean_match["issue " + str(count_issue)]["match"] = m_precise
+                clean_match["issue " + str(count_issue)]["file"] = file
+                
+                # get line number
+                first = read_file_lines[file].index(m) + 1
+                clean_match["issue " + str(count_issue)]["line"] = str(first)
 
-            count_issue += 1
+                count_issue += 1
 
     return clean_match
 

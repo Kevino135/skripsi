@@ -17,11 +17,11 @@ import passwordmeter
 # regex = re.compile(reg, re.IGNORECASE)
 
 string_list = [
-    'PASSWORD= d3v3l0p',
-    'asdsd  das da passwd = checkli',
-    'pwd = Password("andra")',
-    "pass='cfu_lIaN8qLrcg_pssp_ZJZE8gTEEj_wap_UaJ3f7bMvY_pssp_gDJyQQIe7K_be'",
-    'pw := "7erc2rrrS*2018"'
+    'd3v3l0p8015',
+    'checkli',
+    'andra',
+    "password_1",
+    '7erc2rrrS*2018"'
 ]
 
 # for string in string_list:
@@ -29,6 +29,6 @@ string_list = [
 #     print(match[0][1])
 
 for i in string_list:
-    meter = passwordmeter.Meter(settings=dict(factors='length,charmix'))
+    meter = passwordmeter.Meter(settings=dict(factors='charmix,length'))
     strength = meter.test(i)[0]
     print(strength)
