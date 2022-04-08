@@ -1,6 +1,7 @@
-PASSWORD= d3v3l0p8015
+PASSWORD= d3v3l0p7000
 pwd = Password("andra")
 pass='cfu_lIaN8qLrcg_pssp_ZJZE8gTEEj_wap_UaJ3f7bMvY_pssp_gDJyQQIe7K_be'
-pw := "7erc2rrrS*2018"
-passwd = "GetQJOurnalDataByMemberId"
+pw := "7erc2rrr*18"; password="12alhuef+23"
+passwd = "GetDataByMemberId"
 if password = true
+if strcmp(password, "yes")

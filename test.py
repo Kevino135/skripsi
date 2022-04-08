@@ -17,7 +17,7 @@ import passwordmeter
 # regex = re.compile(reg, re.IGNORECASE)
 
 string_list = [
-    'd3v3l0p8015',
+    'd3v3l0p70608',
     'checkli',
     'andra',
     "password_1",
@@ -29,6 +29,6 @@ string_list = [
 #     print(match[0][1])
 
 for i in string_list:
-    meter = passwordmeter.Meter(settings=dict(factors='charmix,length'))
+    meter = passwordmeter.Meter(settings=dict(factors='length,charmix'))
     strength = meter.test(i)[0]
     print(strength)

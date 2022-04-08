@@ -61,8 +61,8 @@ class colors:
 
 
 def getPasswordComplexity(password):
-    # meter = passwordmeter.Meter(settings=dict(factors='length,charmix'))
-    meter = passwordmeter.Meter()
+    meter = passwordmeter.Meter(settings=dict(factors='length,charmix'))
+    # meter = passwordmeter.Meter()
     strength = meter.test(password)[0]
 
     return strength
@@ -102,7 +102,7 @@ def isPassword(read_file, read_file_lines, count_issue):
             password_complexity = getPasswordComplexity(rematch)
             # print(password_complexity)
 
-            if password_complexity >= 0.5:
+            if password_complexity >= 0.2:
                 clean_match["issue " + str(count_issue)] = dict()
                 clean_match["issue " + str(count_issue)]["type"] = "Password"
                 clean_match["issue " + str(count_issue)]["match"] = m_precise
