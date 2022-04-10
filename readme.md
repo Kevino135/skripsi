@@ -2,7 +2,7 @@
 - encode creds if force commit
   - run scan
   - if credentials detected, prompt user to force commit or not
-    - if ![#f03c15](https://via.placeholder.com/15/f03c15/000000?text=yes) `#f03c15`:
+    - if ![#f03c15](https://via.placeholder.com/15/f03c15/000000) `yes`:
       - then set FLAG_FORCE_COMMIT = True
       - encode all creds string
       - git add -> commit leads to re-scan (habit of pre-commit)
@@ -10,5 +10,5 @@
       - set FLAG_FORCE_COMMIT = False, then exit 0
       - git push by user
 
-    - if ![#c5f015](https://via.placeholder.com/15/c5f015/000000?text=no) `#c5f015`:
+    - if ![#c5f015](https://via.placeholder.com/15/c5f015/000000) `no`:
       - then git push by user
