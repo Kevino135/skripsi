@@ -5,6 +5,7 @@
     - if `yes`:
       - then set FLAG_FORCE_COMMIT = True
       - encode all creds string
+      - get commit message for git commit
       - git add -> commit leads to re-scan (habit of pre-commit)
       - check if FLAG_FORCE_COMMIT = True, decode creds to original string
       - set FLAG_FORCE_COMMIT = False, then exit 0
@@ -12,5 +13,3 @@
 
     - if `no`:
       - then git push by user
-
-- store commit message in commit-msg hook, so script can git add & commit based on previous commit message by user
