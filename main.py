@@ -4,8 +4,10 @@ import re
 import os
 import json
 import passwordmeter
-from tabnanny import check
+import platform
 import git
+
+from tabnanny import check
 from colorama import init, Fore, Back, Style
 
 
@@ -131,6 +133,13 @@ def getModifiedFile():
 
 
 def printOut(final_res):
+    os.system('cls' if platform.system().lower() == 'windows' else 'clear')
+
+    header = " SCAN RESULT "
+    
+    print("\n" + Back.RED + Style.BRIGHT + header)
+    print("=" * len(header), "\n")
+
     for issue, details in final_res.items():
         print(Fore.LIGHTBLUE_EX + issue.capitalize())
         
@@ -169,5 +178,5 @@ def main():
 if __name__ == '__main__':
     # initialize colorama init
     init(autoreset = True)
-    
+
     main()

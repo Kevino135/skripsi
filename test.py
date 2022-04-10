@@ -48,5 +48,7 @@ for string in string_list:
 #     print(strength)
 
 init()
-print(Fore.CYAN + Back.LIGHTBLACK_EX + "ANDRA")
-print()
+# print(Fore.CYAN + Back.LIGHTBLACK_EX + "ANDRA")
+# print(type(platform.system()))
+cols, rows = os.get_terminal_size()
+print(cols, rows)
