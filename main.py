@@ -167,5 +167,7 @@ def main():
 
 
 if __name__ == '__main__':
+    # initialize colorama init
     init(autoreset = True)
+    
     main()

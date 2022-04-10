@@ -49,3 +49,4 @@ for string in string_list:
 
 init()
 print(Fore.CYAN + Back.LIGHTBLACK_EX + "ANDRA")
+print()
