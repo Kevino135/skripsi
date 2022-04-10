@@ -5,5 +5,4 @@ pw := "7erc2rrr*18"
 passwd = "GetDataByMemberId"
 if password = true
 if strcmp(password, "yes")
-
 password = os.getenv("PASSWORD")
