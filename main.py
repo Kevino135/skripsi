@@ -171,12 +171,14 @@ def main():
     final_res = {**checkCredentials, **checkPassword}
     print("\n")
 
-    # print
-    printOut(final_res)
+    return final_res
 
 
 if __name__ == '__main__':
     # initialize colorama init
     init(autoreset = True)
 
-    main()
+    scan_result = main()
+    printOut(scan_result)
+
+    
