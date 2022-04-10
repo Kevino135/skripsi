@@ -2,7 +2,9 @@
 - encode creds if force commit
   - run scan
   - if credentials detected, prompt user to force commit or not
-    - if ![#f03c15]yes `#f03c15`:
+    - if ```diff
+      - yes 
+      ```:
       - then set FLAG_FORCE_COMMIT = True
       - encode all creds string
       - git add -> commit leads to re-scan (habit of pre-commit)
