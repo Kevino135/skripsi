@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
+from distutils import extension
+from importlib.metadata import files
 import re
 import os
 import json
 import passwordmeter
 import platform
 import git
+import pathlib
 
 from tabnanny import check
 from colorama import init, Fore, Back, Style
@@ -128,8 +131,15 @@ def readModifiedFile(modified_files):
 def getModifiedFile():
     repo = git.Repo()
     diff_list = repo.git.diff('HEAD', name_only=True, cached=True)
-    
-    return diff_list.split('\n')
+    print(diff_list)
+    exception = ('.jpg', '.jpeg', '.png', '.gif', '.svg', '.mp4', '.mp3', '.webm', '.ttf', '.woff', '.eot', '.css', '.DS_Store','.pdf')
+    a = []
+    # for files in diff_list:
+    files = diff_list.split("\n")
+    for f in files:
+        if not f.endswith(exception):
+            a.append(f)
+    return a
 
 
 def printOut(final_res):
