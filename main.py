@@ -131,15 +131,21 @@ def readModifiedFile(modified_files):
 def getModifiedFile():
     repo = git.Repo()
     diff_list = repo.git.diff('HEAD', name_only=True, cached=True)
-    print(diff_list)
-    exception = ('.jpg', '.jpeg', '.png', '.gif', '.svg', '.mp4', '.mp3', '.webm', '.ttf', '.woff', '.eot', '.css', '.DS_Store','.pdf')
-    a = []
-    # for files in diff_list:
+    
+    exception = ('.jpg', '.jpeg', '.png', '.gif', 
+                 '.svg', '.mp4', '.mp3', '.webm', 
+                 '.ttf', '.woff', '.eot', '.css', 
+                 '.DS_Store','.pdf'
+                )
+
+    list_file = []
+
     files = diff_list.split("\n")
     for f in files:
         if not f.endswith(exception):
-            a.append(f)
-    return a
+            list_file.append(f)
+            
+    return list_file
 
 
 def printOut(final_res):
