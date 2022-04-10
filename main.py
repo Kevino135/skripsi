@@ -181,4 +181,3 @@ if __name__ == '__main__':
     scan_result = main()
     printOut(scan_result)
 
-    

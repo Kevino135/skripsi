@@ -12,3 +12,5 @@
 
     - if `no`:
       - then git push by user
+
+- store commit message in commit-msg hook, so script can git add & commit based on previous commit message by user
