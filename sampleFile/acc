@@ -6,3 +6,4 @@ passwd = "GetDataByMemberId"
 if password = true
 if strcmp(password, "yes")
 password = os.getenv("PASSWORD")
+
