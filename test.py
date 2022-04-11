@@ -5,6 +5,8 @@ import passwordmeter
 import platform
 import os
 from colorama import init, Fore, Back
+import subprocess
+
 
 # wordlist = [
 #     "password",
@@ -38,9 +40,9 @@ string_list = [
 ]
 
 
-for string in string_list:
-    match = regex.findall(string)
-    print(match)
+# for string in string_list:
+#     match = regex.findall(string)
+#     print(match)
 
 # for i in string_list:
 #     meter = passwordmeter.Meter(settings=dict(factors='length,charmix'))
@@ -50,6 +52,16 @@ for string in string_list:
 init()
 # print(Fore.CYAN + Back.LIGHTBLACK_EX + "ANDRA")
 # print(type(platform.system()))
-cols, rows = os.get_terminal_size()
-print(cols, rows)
-print(os.environ['hello'])
+# cols, rows = os.get_terminal_size()
+# print(cols, rows)
+
+linux = "history -n 2 | tail -n 1"
+
+cmd_history = subprocess.check_output(["doskey", "/history"])
+
+
+cmd_history = cmd_history.decode().split("\r\n")
+cmd_history.remove('')
+
+latest_command = cmd_history[-1]
+print(latest_command)
