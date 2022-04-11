@@ -5,6 +5,7 @@ import os
 import json
 import passwordmeter
 import platform
+from cryptography.fernet import Fernet
 
 from tabnanny import check
 from colorama import init, Fore, Back, Style
@@ -143,6 +144,32 @@ def getModifiedFile():
     return list_file
 
 
+def selectFilesToEncrypt(final_res):
+    files_to_encrypt = dict()
+    for issue, details in final_res.items():
+        print(Fore.LIGHTBLUE_EX + issue.capitalize())
+        for key, values in details.items():
+            if key == "match":
+                print("%-12s : %s%-2s" % (key.capitalize(), Fore.LIGHTGREEN_EX , values))
+            else:
+                print("%-12s : %-2s" % (key.capitalize(), values))
+
+        encrypt_input = ""
+        while encrypt_input.lower() != "y" and encrypt_input.lower() != "n":
+            encrypt_input = input("Encrypt? (Y/n)")
+            if encrypt_input.lower() == "y":
+                for key, values in details.items():
+                    files_to_encrypt[issue][key] = values
+            elif encrypt_input.lower() == "n":
+                continue
+    
+    return files_to_encrypt
+
+
+def encrypt(files_to_encrypt):
+    pass
+
+
 def printOut(final_res):
     os.system('cls' if platform.system().lower() == 'windows' else 'clear')
 
@@ -182,13 +209,41 @@ def main():
     final_res = {**checkCredentials, **checkPassword}
     print("\n")
 
-    return final_res
+    if final_res:
+        # print(final_res)
+        printOut(final_res)
+        continue_input = 0
+        while continue_input < 1 or continue_input > 3:
+            print("")
+            print("1. Continue with encryption")
+            print("2. Continue without encryption")
+            print("3. Cancel")
+            while True:
+                try:
+                    continue_input = int(input("Select [1/2/3]: "))
+                    break
+                except ValueError:
+                    print("Enter an integer")
+            if continue_input == 1:
+                files_to_encrypt = selectFilesToEncrypt(final_res)
+                encrypt(files_to_encrypt)
+            elif continue_input == 2:
+                confirm = ""
+                while confirm.lower() != "y" and confirm.lower() != "n":
+                    confirm = input("Confirm to continue without encryption (Y/n): ")
+                    if confirm.lower() == "y":
+                        return 0
+                    elif confirm.lower() == "n":
+                        return 1
+            elif continue_input == 3:
+                return 1
+
+    else:
+        return 0
 
 
 if __name__ == '__main__':
     # initialize colorama init
     init(autoreset = True)
 
-    scan_result = main()
-    printOut(scan_result)
-
+    main()
