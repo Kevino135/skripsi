@@ -146,22 +146,47 @@ def getModifiedFile():
 
 def selectFilesToEncrypt(final_res):
     files_to_encrypt = dict()
-    for issue, details in final_res.items():
-        print(Fore.LIGHTBLUE_EX + issue.capitalize())
-        for key, values in details.items():
-            if key == "match":
-                print("%-12s : %s%-2s" % (key.capitalize(), Fore.LIGHTGREEN_EX , values))
-            else:
-                print("%-12s : %-2s" % (key.capitalize(), values))
+    issue_input = input("Enter issues number to encrypt (ex: 1,2,5): ")
+    issue_input = issue_input.split(",")
+    for inputs in issue_input:
+        if "issue {}".format(inputs) in final_res.keys():
+            file_name = final_res["issue {}".format(inputs)]['file']
+            if file_name not in files_to_encrypt:
+                files_to_encrypt[file_name] = dict()
+            files_to_encrypt[file_name]["issue {}".format(inputs)] = dict()
+            files_to_encrypt[file_name]["issue {}".format(inputs)]['match'] = final_res["issue {}".format(inputs)]['match']
+            files_to_encrypt[file_name]["issue {}".format(inputs)]['line'] = final_res["issue {}".format(inputs)]['line']
 
-        encrypt_input = ""
-        while encrypt_input.lower() != "y" and encrypt_input.lower() != "n":
-            encrypt_input = input("Encrypt? (Y/n)")
-            if encrypt_input.lower() == "y":
-                for key, values in details.items():
-                    files_to_encrypt[issue][key] = values
-            elif encrypt_input.lower() == "n":
-                continue
+    # for issue, details in final_res.items():
+    #     print(issue)
+    #     if issue.split(" ")[1] in issue_input:
+    #         if details['file'] not in files_to_encrypt:
+    #             files_to_encrypt[details['file']] = dict()
+    #             if issue not in files_to_encrypt[details['file']]:
+    #                 files_to_encrypt[details['file']][issue] = dict()
+    #         for key, values in details.items():
+    #             if key != 'file':
+    #                 files_to_encrypt[details['file']][issue][key] = values
+        # print("")
+        # print(Fore.LIGHTBLUE_EX + issue.capitalize())
+        # for key, values in details.items():
+        #     if key == "match":
+        #         print("%-12s : %s%-2s" % (key.capitalize(), Fore.LIGHTGREEN_EX , values))
+        #     else:
+        #         print("%-12s : %-2s" % (key.capitalize(), values))
+
+        # encrypt_input = ""
+        # while encrypt_input.lower() != "y" and encrypt_input.lower() != "n":
+        #     encrypt_input = input("Encrypt? (Y/n)")
+        #     if encrypt_input.lower() == "y":
+        #         for key, values in details.items():
+        #             if key != 'file':
+        #                 if files_to_encrypt[details['file']]
+        #                 files_to_encrypt[details['file']] = dict()
+        #                 files_to_encrypt[details['file']][issue]
+        #                 [key] = values
+        #     elif encrypt_input.lower() == "n":
+        #         continue
     
     return files_to_encrypt
 
@@ -226,6 +251,7 @@ def main():
                     print("Enter an integer")
             if continue_input == 1:
                 files_to_encrypt = selectFilesToEncrypt(final_res)
+                # print(files_to_encrypt)
                 encrypt(files_to_encrypt)
             elif continue_input == 2:
                 confirm = ""
