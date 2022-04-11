@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
 
-from distutils import extension
-from importlib.metadata import files
 import re
 import os
 import json
 import passwordmeter
 import platform
-import git
-import pathlib
 
 from tabnanny import check
 from colorama import init, Fore, Back, Style
@@ -24,10 +20,10 @@ def getPasswordComplexity(password):
 
 # filter string -> only get password
 def getPasswordOnly(wordlist, m_precise):
-    regex_password_acc = ".*({})[\s=(:\'\"<>]*([a-zA-Z0-9_\!\#,@\/\\\:\;.\|\$=\+\-\*\^\?\&\~\%]*)[\')><\"]*".format("|".join(wordlist))
-    rematch = re.findall(regex_password_acc, m_precise, re.IGNORECASE)
+    regex_password_acc = ".*(?:{})[\s=(:\'\"<>]+([a-zA-Z0-9_\!\#,@\/\\\:\;.\|\$=\+\-\*\^\?\&\~\%]*)[\')><\"]*".format("|".join(wordlist))
+    rematch = re.match(regex_password_acc, m_precise, re.IGNORECASE)
 
-    return rematch[0][1]
+    return rematch.groups()[0]
 
 
 def isPassword(read_file, read_file_lines, count_issue):
@@ -44,7 +40,7 @@ def isPassword(read_file, read_file_lines, count_issue):
     ]
 
     # every string contains password in one line
-    regex_password = ".*{}.*".format(".*|.*".join(wordlist))
+    regex_password = ".*(?:{})[\s=(:\'\"<>]+.*".format("|".join(wordlist))
     regex = re.compile(regex_password, re.IGNORECASE)
 
     clean_match = dict()
@@ -129,8 +125,8 @@ def readModifiedFile(modified_files):
 
 
 def getModifiedFile():
-    repo = git.Repo()
-    diff_list = repo.git.diff('HEAD', name_only=True, cached=True)
+    diff_list = os.popen("git diff --name-only --cached").read()
+    diff_list = diff_list.strip().split("\n")
     
     exception = ('.jpg', '.jpeg', '.png', '.gif', 
                  '.svg', '.mp4', '.mp3', '.webm', 
@@ -140,8 +136,7 @@ def getModifiedFile():
 
     list_file = []
 
-    files = diff_list.split("\n")
-    for f in files:
+    for f in diff_list:
         if not f.endswith(exception):
             list_file.append(f)
             
