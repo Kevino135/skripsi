@@ -5,7 +5,6 @@ import os
 import json
 import passwordmeter
 import platform
-import git
 
 from cryptography.fernet import Fernet
 from tabnanny import check
@@ -162,9 +161,9 @@ def selectFilesToEncrypt(final_res):
 
 
 def doEncryption(files_to_encrypt):
-    git_repo = git.Repo(".", search_parent_directories=True)
-    git_root = git_repo.git.rev_parse("--show-toplevel")
+    git_root = os.popen("git rev-parse --show-toplevel").read()
     print(git_root)
+
 
 
 def printOut(final_res):
