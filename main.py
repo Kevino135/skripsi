@@ -4,60 +4,10 @@ import re
 import os
 import json
 import passwordmeter
+import platform
+
 from tabnanny import check
-import git
-
-
-class colors:
-    reset = "\033[0m"
-
-    # Black
-    fgBlack = "\033[30m"
-    fgBrightBlack = "\033[30;1m"
-    bgBlack = "\033[40m"
-    bgBrightBlack = "\033[40;1m"
-
-    # Red
-    fgRed = "\033[31m"
-    fgBrightRed = "\033[31;1m"
-    bgRed = "\033[41m"
-    bgBrightRed = "\033[41;1m"
-
-    # Green
-    fgGreen = "\033[32m"
-    fgBrightGreen = "\033[32;1m"
-    bgGreen = "\033[42m"
-    bgBrightGreen = "\033[42;1m"
-
-    # Yellow
-    fgYellow = "\033[33m"
-    fgBrightYellow = "\033[33;1m"
-    bgYellow = "\033[43m"
-    bgBrightYellow = "\033[43;1m"
-
-    # Blue
-    fgBlue = "\033[34m"
-    fgBrightBlue = "\033[34;1m"
-    bgBlue = "\033[44m"
-    bgBrightBlue = "\033[44;1m"
-
-    # Magenta
-    fgMagenta = "\033[35m"
-    fgBrightMagenta = "\033[35;1m"
-    bgMagenta = "\033[45m"
-    bgBrightMagenta = "\033[45;1m"
-
-    # Cyan
-    fgCyan = "\033[36m"
-    fgBrightCyan = "\033[36;1m"
-    bgCyan = "\033[46m"
-    bgBrightCyan = "\033[46;1m"
-
-    # White
-    fgWhite = "\033[37m"
-    fgBrightWhite = "\033[37;1m"
-    bgWhite = "\033[47m"
-    bgBrightWhite = "\033[47;1m"
+from colorama import init, Fore, Back, Style
 
 
 def getPasswordComplexity(password):
@@ -68,11 +18,12 @@ def getPasswordComplexity(password):
     return strength
 
 
+# filter string -> only get password
 def getPasswordOnly(wordlist, m_precise):
-    regex_password_acc = ".*({})[\s=(:\'\"<>]*([a-zA-Z0-9_\!\#,@\/\\\:\;.\|\$=\+\-\*\^\?\&\~\%]*)[\')><\"]*".format("|".join(wordlist))
-    rematch = re.findall(regex_password_acc, m_precise, re.IGNORECASE)
+    regex_password_acc = ".*(?:{})[\s=(:\'\"<>]+([a-zA-Z0-9_\!\#,@\/\\\:\;.\|\$=\+\-\*\^\?\&\~\%]*)[\')><\"]*".format("|".join(wordlist))
+    rematch = re.match(regex_password_acc, m_precise, re.IGNORECASE)
 
-    return rematch[0][1]
+    return rematch.groups()[0]
 
 
 def isPassword(read_file, read_file_lines, count_issue):
@@ -88,12 +39,14 @@ def isPassword(read_file, read_file_lines, count_issue):
         "pw"
     ]
 
-    regex_password = ".*{}.*".format(".*|.*".join(wordlist))
+    # every string contains password in one line
+    regex_password = ".*(?:{})[\s=(:\'\"<>]+.*".format("|".join(wordlist))
     regex = re.compile(regex_password, re.IGNORECASE)
 
     clean_match = dict()
     for file, vals in read_file.items():
         match = regex.findall(vals)
+        
         # assign issue if exists
         for m in match:
             m_precise = m.strip()
@@ -172,19 +125,38 @@ def readModifiedFile(modified_files):
 
 
 def getModifiedFile():
-    repo = git.Repo()
-    diff_list = repo.git.diff('HEAD', name_only=True, cached=True)
+    diff_list = os.popen("git diff --name-only --cached").read()
+    diff_list = diff_list.strip().split("\n")
     
-    return diff_list.split('\n')
+    exception = ('.jpg', '.jpeg', '.png', '.gif', 
+                 '.svg', '.mp4', '.mp3', '.webm', 
+                 '.ttf', '.woff', '.eot', '.css', 
+                 '.DS_Store','.pdf'
+                )
+
+    list_file = []
+
+    for f in diff_list:
+        if not f.endswith(exception):
+            list_file.append(f)
+            
+    return list_file
 
 
 def printOut(final_res):
+    os.system('cls' if platform.system().lower() == 'windows' else 'clear')
+
+    header = " SCAN RESULT "
+    
+    print("\n" + Back.RED + Style.BRIGHT + header)
+    print("=" * len(header), "\n")
+
     for issue, details in final_res.items():
-        print(colors.fgBrightBlue + issue.capitalize() + colors.reset)
+        print(Fore.LIGHTBLUE_EX + issue.capitalize())
         
         for key, values in details.items():
             if key == "match":
-                print("%-12s : %s%-2s%s" % (key.capitalize(), colors.fgBrightGreen, values, colors.reset))
+                print("%-12s : %s%-2s" % (key.capitalize(), Fore.LIGHTGREEN_EX , values))
             else:
                 print("%-12s : %-2s" % (key.capitalize(), values))
         print("\n")
@@ -210,11 +182,13 @@ def main():
     final_res = {**checkCredentials, **checkPassword}
     print("\n")
 
-    # print
-    printOut(final_res)
-
-
+    return final_res
 
 
 if __name__ == '__main__':
-    main()
+    # initialize colorama init
+    init(autoreset = True)
+
+    scan_result = main()
+    printOut(scan_result)
+
