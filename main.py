@@ -192,7 +192,41 @@ def selectFilesToEncrypt(final_res):
 
 
 def encrypt(files_to_encrypt):
-    pass
+    key_input = -1
+    while key_input < 0 or key_input > 2:
+        print("1. Generate new key")
+        print("2. Use existing generated key")
+        print("0. Cancel")
+        while True:
+            try:
+                key_input = int(input("Select [1/2/0]: "))
+                break
+            except ValueError:
+                print("Enter an integer")
+    if key_input == 1:
+        enc_key = Fernet.generate_key()
+        print("Key: {}\n (Save this key, it is used for encryption and decryption)".format(enc_key))
+        fernet = Fernet(enc_key)
+        for file_name, issues in files_to_encrypt.items():
+            with open(file_name, "r+") as f:
+                lines = f.read()
+                for issue in issues.keys():
+                    encrypted_string = fernet.encrypt(issue['match'].encode())
+                    lines.replace(issue['match'], encrypted_string)
+                f.write(lines)
+        return 0
+
+    elif key_input == 2:
+        enc_key = input("Enter key: ")
+        fernet = Fernet(enc_key)
+        for file_name, issues in files_to_encrypt.items():
+            with open(file_name, "r+") as f:
+                lines = f.read()
+                for issue in issues.keys():
+                    encrypted_string = fernet.encrypt(issue['match'].encode())
+                    lines.replace(issue['match'], encrypted_string)
+                f.write(lines)
+        return 0
 
 
 def printOut(final_res):
@@ -235,35 +269,32 @@ def main():
     print("\n")
 
     if final_res:
-        # print(final_res)
         printOut(final_res)
-        continue_input = 0
-        while continue_input < 1 or continue_input > 3:
+        continue_input = -1
+        while continue_input < 0 or continue_input > 2:
             print("")
             print("1. Continue with encryption")
             print("2. Continue without encryption")
-            print("3. Cancel")
+            print("0. Cancel")
             while True:
                 try:
-                    continue_input = int(input("Select [1/2/3]: "))
+                    continue_input = int(input("Select [1/2/0]: "))
                     break
                 except ValueError:
                     print("Enter an integer")
-            if continue_input == 1:
-                files_to_encrypt = selectFilesToEncrypt(final_res)
-                # print(files_to_encrypt)
-                encrypt(files_to_encrypt)
-            elif continue_input == 2:
-                confirm = ""
-                while confirm.lower() != "y" and confirm.lower() != "n":
-                    confirm = input("Confirm to continue without encryption (Y/n): ")
-                    if confirm.lower() == "y":
-                        return 0
-                    elif confirm.lower() == "n":
-                        return 1
-            elif continue_input == 3:
-                return 1
-
+        if continue_input == 1:
+            files_to_encrypt = selectFilesToEncrypt(final_res)
+            encrypt(files_to_encrypt)
+        elif continue_input == 2:
+            confirm = ""
+            while confirm.lower() != "y" and confirm.lower() != "n":
+                confirm = input("Confirm to continue without encryption (Y/n): ")
+                if confirm.lower() == "y":
+                    return 0
+                elif confirm.lower() == "n":
+                    return 1
+        elif continue_input == 0:
+            return 1
     else:
         return 0
 
