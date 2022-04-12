@@ -5,7 +5,9 @@ import os
 import json
 import passwordmeter
 import platform
+import git
 
+from cryptography.fernet import Fernet
 from tabnanny import check
 from colorama import init, Fore, Back, Style
 
@@ -143,6 +145,28 @@ def getModifiedFile():
     return list_file
 
 
+def selectFilesToEncrypt(final_res):
+    files_to_encrypt = dict()
+    issue_input = input("Enter issues number to encrypt (ex: 1,2,5): ")
+    issue_input = issue_input.split(",")
+    for inputs in issue_input:
+        if "issue {}".format(inputs) in final_res.keys():
+            file_name = final_res["issue {}".format(inputs)]['file']
+            if file_name not in files_to_encrypt:
+                files_to_encrypt[file_name] = dict()
+            files_to_encrypt[file_name]["issue {}".format(inputs)] = dict()
+            files_to_encrypt[file_name]["issue {}".format(inputs)]['match'] = final_res["issue {}".format(inputs)]['match']
+            files_to_encrypt[file_name]["issue {}".format(inputs)]['line'] = final_res["issue {}".format(inputs)]['line']
+    
+    return files_to_encrypt
+
+
+def doEncryption(files_to_encrypt):
+    git_repo = git.Repo(".", search_parent_directories=True)
+    git_root = git_repo.git.rev_parse("--show-toplevel")
+    print(git_root)
+
+
 def printOut(final_res):
     os.system('cls' if platform.system().lower() == 'windows' else 'clear')
 
@@ -162,6 +186,41 @@ def printOut(final_res):
         print("\n")
 
 
+
+def doMitigation(final_res):
+    printOut(final_res)
+
+    continue_input = 0
+
+    while continue_input not in [1, 2, 3]:
+        print("")
+        print("1. Continue with encryption")
+        print("2. Continue without encryption")
+        print("3. Cancel")
+        while True:
+            try:
+                continue_input = int(input("Select [1/2/3]: "))
+                break
+            except ValueError:
+                print("Enter an integer\n")
+
+        if continue_input == 1:
+            files_to_encrypt = selectFilesToEncrypt(final_res)
+            # print(files_to_encrypt)
+            doEncryption(files_to_encrypt)
+
+        elif continue_input == 2:
+            confirm = ""
+            while confirm.lower() not in ["y", "n"]:
+                confirm = input("Confirm to continue without encryption (Y/n): ")
+                if confirm.lower() == "y":
+                    return 0
+                elif confirm.lower() == "n":
+                    return 1
+        elif continue_input == 3:
+            return 1
+
+
 def main():
     # list modified file from git diff
     modified_files = getModifiedFile()
@@ -173,22 +232,23 @@ def main():
     read_file_lines, read_file = readModifiedFile(modified_files)
 
     # check creds such as api, token, private key, etc
-    checkCredentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
+    check_credentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
 
     # check creds such as password
-    checkPassword = isPassword(read_file, read_file_lines, count_issue)
+    check_password = isPassword(read_file, read_file_lines, count_issue)
 
     # merge dict
-    final_res = {**checkCredentials, **checkPassword}
+    final_res = {**check_credentials, **check_password}
     print("\n")
 
-    return final_res
+    if final_res:
+        mitigation_decision = doMitigation(final_res)
+    else:
+        return 0
 
 
 if __name__ == '__main__':
     # initialize colorama init
     init(autoreset = True)
 
-    scan_result = main()
-    printOut(scan_result)
-
+    main()
