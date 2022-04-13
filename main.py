@@ -146,6 +146,7 @@ def getModifiedFile():
 
 def selectFilesToEncrypt(final_res):
     files_to_encrypt = dict()
+    print("")
     issue_input = input("Enter issues number to encrypt (ex: 1,2,5): ")
     issue_input = issue_input.split(",")
     for inputs in issue_input:
@@ -194,6 +195,7 @@ def selectFilesToEncrypt(final_res):
 def encrypt(files_to_encrypt):
     key_input = -1
     while key_input < 0 or key_input > 2:
+        print("")
         print("1. Generate new key")
         print("2. Use existing generated key")
         print("0. Cancel")
@@ -205,28 +207,35 @@ def encrypt(files_to_encrypt):
                 print("Enter an integer")
     if key_input == 1:
         enc_key = Fernet.generate_key()
-        print("Key: {}\n (Save this key, it is used for encryption and decryption)".format(enc_key))
+        print("")
+        print("Key: {}\n(Save this key, it is used for encryption and decryption)".format(enc_key.decode()))
         fernet = Fernet(enc_key)
         for file_name, issues in files_to_encrypt.items():
-            with open(file_name, "r+") as f:
+            with open(file_name, "r") as f:
                 lines = f.read()
-                for issue in issues.keys():
-                    encrypted_string = fernet.encrypt(issue['match'].encode())
-                    lines.replace(issue['match'], encrypted_string)
+                for issue in issues:
+                    encrypted_string = fernet.encrypt(issues[issue]['match'].encode())
+                    lines = lines.replace(issues[issue]['match'], encrypted_string.decode())
+            with open(file_name, "w") as f:
                 f.write(lines)
         return 0
 
     elif key_input == 2:
+        print("")
         enc_key = input("Enter key: ")
         fernet = Fernet(enc_key)
         for file_name, issues in files_to_encrypt.items():
-            with open(file_name, "r+") as f:
+            with open(file_name, "r") as f:
                 lines = f.read()
-                for issue in issues.keys():
-                    encrypted_string = fernet.encrypt(issue['match'].encode())
-                    lines.replace(issue['match'], encrypted_string)
+                for issue in issues:
+                    encrypted_string = fernet.encrypt(issues[issue]['match'].encode())
+                    lines = lines.replace(issues[issue]['match'], encrypted_string.decode())
+            with open(file_name, "w") as f:
                 f.write(lines)
         return 0
+    
+    elif key_input == 0:
+        return 1
 
 
 def printOut(final_res):
