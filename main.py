@@ -7,12 +7,11 @@ import passwordmeter
 import platform
 from cryptography.fernet import Fernet
 
-from tabnanny import check
 from colorama import init, Fore, Back, Style
 
 
 def getPasswordComplexity(password):
-    meter = passwordmeter.Meter(settings=dict(factors='length,charmix'))
+    meter = passwordmeter.Meter(settings=dict(factors="length,charmix"))
     # meter = passwordmeter.Meter()
     strength = meter.test(password)[0]
 
@@ -21,7 +20,9 @@ def getPasswordComplexity(password):
 
 # filter string -> only get password
 def getPasswordOnly(wordlist, m_precise):
-    regex_password_acc = ".*(?:{})[\s=(:\'\"<>]+([a-zA-Z0-9_\!\#,@\/\\\:\;.\|\$=\+\-\*\^\?\&\~\%]*)[\')><\"]*".format("|".join(wordlist))
+    regex_password_acc = ".*(?:{})[\s=(:'\"<>]+([a-zA-Z0-9_\!\#,@\/\\\:\;.\|\$=\+\-\*\^\?\&\~\%]*)[')><\"]*".format(
+        "|".join(wordlist)
+    )
     rematch = re.match(regex_password_acc, m_precise, re.IGNORECASE)
 
     return rematch.groups()[0]
@@ -30,29 +31,28 @@ def getPasswordOnly(wordlist, m_precise):
 def isPassword(read_file, read_file_lines, count_issue):
     wordlist = [
         "secret",
-
         "pgpassword",
         "password",
         "passwd",
         "pswrd",
         "pass",
         "pwd",
-        "pw"
+        "pw",
     ]
 
     # every string contains password in one line
-    regex_password = ".*(?:{})[\s=(:\'\"<>]+.*".format("|".join(wordlist))
+    regex_password = ".*(?:{})[\s=(:'\"<>]+.*".format("|".join(wordlist))
     regex = re.compile(regex_password, re.IGNORECASE)
 
     clean_match = dict()
     for file, vals in read_file.items():
         match = regex.findall(vals)
-        
+
         # assign issue if exists
         for m in match:
             m_precise = m.strip()
 
-            rematch             = getPasswordOnly(wordlist, m_precise)
+            rematch = getPasswordOnly(wordlist, m_precise)
             password_complexity = getPasswordComplexity(rematch)
             # print(password_complexity)
 
@@ -61,7 +61,7 @@ def isPassword(read_file, read_file_lines, count_issue):
                 clean_match["issue " + str(count_issue)]["type"] = "Password"
                 clean_match["issue " + str(count_issue)]["match"] = m_precise
                 clean_match["issue " + str(count_issue)]["file"] = file
-                
+
                 # get line number
                 first = read_file_lines[file].index(m) + 1
                 clean_match["issue " + str(count_issue)]["line"] = str(first)
@@ -81,7 +81,7 @@ def isCredentials(regex_creds, read_file, read_file_lines):
 
         for file, vals in read_file.items():
             match = regex.findall(vals)
-    
+
             # assign issue if exists
             for m in match:
                 m = m.strip()
@@ -90,16 +90,22 @@ def isCredentials(regex_creds, read_file, read_file_lines):
                 clean_match["issue " + str(count_issue)]["type"] = regex_type
                 clean_match["issue " + str(count_issue)]["match"] = m
                 clean_match["issue " + str(count_issue)]["file"] = file
-                
+
                 # get line number
-                if "private" in regex_type.lower() or "certificate" in regex_type.lower():
+                if (
+                    "private" in regex_type.lower()
+                    or "certificate" in regex_type.lower()
+                ):
                     header = m.split("\n")[1]
                     first = (read_file_lines[file].index(header) + 1) - 1
                     last = first + len(m.split("\n")) - 1
-                    clean_match["issue " + str(count_issue)]["line"] = f"{first} - {last}"
+                    clean_match["issue " + str(count_issue)][
+                        "line"
+                    ] = f"{first} - {last}"
                 else:
                     first = read_file_lines[file].index(m) + 1
-                    clean_match["issue " + str(count_issue)]["line"] = str(first)
+                    clean_match["issue " +
+                                str(count_issue)]["line"] = str(first)
 
                 count_issue += 1
 
@@ -108,7 +114,7 @@ def isCredentials(regex_creds, read_file, read_file_lines):
 
 def readModifiedFile(modified_files):
     read_file_lines = dict()
-    read_file       = dict()
+    read_file = dict()
 
     for file in modified_files:
         with open(file) as f:
@@ -116,7 +122,7 @@ def readModifiedFile(modified_files):
             data = [x.replace("\n", "").strip() for x in data]
             # data = [x for x in data if x != '']
             read_file_lines[file] = data
-    
+
     for file in modified_files:
         with open(file) as f:
             datas = f.read()
@@ -128,19 +134,30 @@ def readModifiedFile(modified_files):
 def getModifiedFile():
     diff_list = os.popen("git diff --name-only --cached").read()
     diff_list = diff_list.strip().split("\n")
-    
-    exception = ('.jpg', '.jpeg', '.png', '.gif', 
-                 '.svg', '.mp4', '.mp3', '.webm', 
-                 '.ttf', '.woff', '.eot', '.css', 
-                 '.DS_Store','.pdf'
-                )
+
+    exception = (
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".svg",
+        ".mp4",
+        ".mp3",
+        ".webm",
+        ".ttf",
+        ".woff",
+        ".eot",
+        ".css",
+        ".DS_Store",
+        ".pdf",
+    )
 
     list_file = []
 
     for f in diff_list:
         if not f.endswith(exception):
             list_file.append(f)
-            
+
     return list_file
 
 
@@ -151,44 +168,17 @@ def selectFilesToEncrypt(final_res):
     issue_input = issue_input.split(",")
     for inputs in issue_input:
         if "issue {}".format(inputs) in final_res.keys():
-            file_name = final_res["issue {}".format(inputs)]['file']
+            file_name = final_res["issue {}".format(inputs)]["file"]
             if file_name not in files_to_encrypt:
                 files_to_encrypt[file_name] = dict()
             files_to_encrypt[file_name]["issue {}".format(inputs)] = dict()
-            files_to_encrypt[file_name]["issue {}".format(inputs)]['match'] = final_res["issue {}".format(inputs)]['match']
-            files_to_encrypt[file_name]["issue {}".format(inputs)]['line'] = final_res["issue {}".format(inputs)]['line']
+            files_to_encrypt[file_name]["issue {}".format(inputs)]["match"] = final_res[
+                "issue {}".format(inputs)
+            ]["match"]
+            files_to_encrypt[file_name]["issue {}".format(inputs)]["line"] = final_res[
+                "issue {}".format(inputs)
+            ]["line"]
 
-    # for issue, details in final_res.items():
-    #     print(issue)
-    #     if issue.split(" ")[1] in issue_input:
-    #         if details['file'] not in files_to_encrypt:
-    #             files_to_encrypt[details['file']] = dict()
-    #             if issue not in files_to_encrypt[details['file']]:
-    #                 files_to_encrypt[details['file']][issue] = dict()
-    #         for key, values in details.items():
-    #             if key != 'file':
-    #                 files_to_encrypt[details['file']][issue][key] = values
-        # print("")
-        # print(Fore.LIGHTBLUE_EX + issue.capitalize())
-        # for key, values in details.items():
-        #     if key == "match":
-        #         print("%-12s : %s%-2s" % (key.capitalize(), Fore.LIGHTGREEN_EX , values))
-        #     else:
-        #         print("%-12s : %-2s" % (key.capitalize(), values))
-
-        # encrypt_input = ""
-        # while encrypt_input.lower() != "y" and encrypt_input.lower() != "n":
-        #     encrypt_input = input("Encrypt? (Y/n)")
-        #     if encrypt_input.lower() == "y":
-        #         for key, values in details.items():
-        #             if key != 'file':
-        #                 if files_to_encrypt[details['file']]
-        #                 files_to_encrypt[details['file']] = dict()
-        #                 files_to_encrypt[details['file']][issue]
-        #                 [key] = values
-        #     elif encrypt_input.lower() == "n":
-        #         continue
-    
     return files_to_encrypt
 
 
@@ -208,17 +198,24 @@ def encrypt(files_to_encrypt):
     if key_input == 1:
         enc_key = Fernet.generate_key()
         print("")
-        print("Key: {}\n(Save this key, it is used for encryption and decryption)".format(enc_key.decode()))
+        print(
+            "Key: {}\n(Save this key, it is used for encryption and decryption)".format(
+                enc_key.decode()
+            )
+        )
         fernet = Fernet(enc_key)
         for file_name, issues in files_to_encrypt.items():
             with open(file_name, "r") as f:
                 lines = f.read()
                 for issue in issues:
-                    encrypted_string = fernet.encrypt(issues[issue]['match'].encode())
-                    lines = lines.replace(issues[issue]['match'], encrypted_string.decode())
+                    encrypted_string = fernet.encrypt(
+                        issues[issue]["match"].encode())
+                    lines = lines.replace(
+                        issues[issue]["match"], encrypted_string.decode()
+                    )
             with open(file_name, "w") as f:
                 f.write(lines)
-        return 0
+        return 1
 
     elif key_input == 2:
         print("")
@@ -228,30 +225,34 @@ def encrypt(files_to_encrypt):
             with open(file_name, "r") as f:
                 lines = f.read()
                 for issue in issues:
-                    encrypted_string = fernet.encrypt(issues[issue]['match'].encode())
-                    lines = lines.replace(issues[issue]['match'], encrypted_string.decode())
+                    encrypted_string = fernet.encrypt(
+                        issues[issue]["match"].encode())
+                    lines = lines.replace(
+                        issues[issue]["match"], encrypted_string.decode()
+                    )
             with open(file_name, "w") as f:
                 f.write(lines)
-        return 0
-    
+        return 1
+
     elif key_input == 0:
         return 1
 
 
 def printOut(final_res):
-    os.system('cls' if platform.system().lower() == 'windows' else 'clear')
+    os.system("cls" if platform.system().lower() == "windows" else "clear")
 
     header = " SCAN RESULT "
-    
+
     print("\n" + Back.RED + Style.BRIGHT + header)
     print("=" * len(header), "\n")
 
     for issue, details in final_res.items():
         print(Fore.LIGHTBLUE_EX + issue.capitalize())
-        
+
         for key, values in details.items():
             if key == "match":
-                print("%-12s : %s%-2s" % (key.capitalize(), Fore.LIGHTGREEN_EX , values))
+                print("%-12s : %s%-2s" %
+                      (key.capitalize(), Fore.LIGHTGREEN_EX, values))
             else:
                 print("%-12s : %-2s" % (key.capitalize(), values))
         print("\n")
@@ -262,13 +263,16 @@ def main():
     modified_files = getModifiedFile()
 
     # get list of regex
-    with open("regex.json") as f: regex_creds = json.load(f)
+    with open("regex.json") as f:
+        regex_creds = json.load(f)
 
     # read file per line and whole file
     read_file_lines, read_file = readModifiedFile(modified_files)
 
     # check creds such as api, token, private key, etc
-    checkCredentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
+    checkCredentials, count_issue = isCredentials(
+        regex_creds, read_file, read_file_lines
+    )
 
     # check creds such as password
     checkPassword = isPassword(read_file, read_file_lines, count_issue)
@@ -297,7 +301,8 @@ def main():
         elif continue_input == 2:
             confirm = ""
             while confirm.lower() != "y" and confirm.lower() != "n":
-                confirm = input("Confirm to continue without encryption (Y/n): ")
+                confirm = input(
+                    "Confirm to continue without encryption (Y/n): ")
                 if confirm.lower() == "y":
                     return 0
                 elif confirm.lower() == "n":
@@ -308,8 +313,8 @@ def main():
         return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # initialize colorama init
-    init(autoreset = True)
+    init(autoreset=True)
 
     main()
