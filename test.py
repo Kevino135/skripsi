@@ -50,18 +50,8 @@ string_list = [
 #     print(strength)
 
 init()
-# print(Fore.CYAN + Back.LIGHTBLACK_EX + "ANDRA")
-# print(type(platform.system()))
-# cols, rows = os.get_terminal_size()
-# print(cols, rows)
-
-linux = "history -n 2 | tail -n 1"
-
-cmd_history = subprocess.check_output(["doskey", "/history"])
 
 
-cmd_history = cmd_history.decode().split("\r\n")
-cmd_history.remove('')
 
-latest_command = cmd_history[-1]
-print(latest_command)
+# compressed_ext  = os.path.splitext(file_name)[1]
+# compressed_name = os.path.splitext(file_name)[0]
