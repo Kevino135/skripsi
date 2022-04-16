@@ -64,16 +64,23 @@ for root, directories, files in os.walk("./compressed"):
 
 import gzip
 import magic
+import os
+from datetime import datetime
 
-with open("test2/pass.txt", "r") as f:
-    data = f.read().encode()
+time_data = datetime.now()
+fmt_date = "%Y-%m-%d_%H:%M:%S"
+time_data = datetime.strftime(time_data, fmt_date)
 
-s = gzip.compress(data)
+print(time_data)
+# os.mkdir()
 
-with gzip.GzipFile("asd.gz", "w") as g:
-    g.write(s)
+a = ["a", "b", "C"]
+b = ["d"]
 
-with gzip.GzipFile("asd.gz", "r") as g:
-    a = g.read()
-    b = gzip.decompress(a)
-    print(b)
+if "helld".endswith(tuple(a)):
+    print("In A")
+elif "helld".endswith(tuple(b)):
+    print("In B")
+
+a = a + b
+print(a)

@@ -5,9 +5,160 @@ import os
 import json
 import passwordmeter
 import platform
-from cryptography.fernet import Fernet
+import sys
+import shutil
+from datetime import datetime
 
+from cryptography.fernet import Fernet
 from colorama import init, Fore, Back, Style
+
+import magic
+import tarfile
+import zipfile
+import gzip
+import py7zr
+
+
+class Zip:
+    def compress(self, target_path):
+        files_list = []
+        for root, directories, files in os.walk("test1"):
+            for name in files:
+                files_list.append(os.path.join(root, name))
+
+        with zipfile.ZipFile(target_path, 'w') as z:
+            for files in files_list:
+                z.write(files)
+    
+    def decompress(self, target_path, extract_path):
+        with zipfile.ZipFile(target_path, 'r') as z:
+            z.extractall(extract_path)
+
+    def list(self, target_path):
+        with zipfile.ZipFile(target_path, 'r') as z:
+            return z.namelist()
+
+
+class Sevenzip:
+    def compress(self, target_path):
+        with py7zr.SevenZipFile(target_path, 'w') as sz:
+            sz.writeall("test2")
+
+    def decompress(self, target_path, extract_path):
+        with py7zr.SevenZipFile(target_path, 'r') as sz:
+            sz.extractall(extract_path)
+
+    def list(self, target_path):
+        with py7zr.SevenZipFile(target_path, 'r') as sz:
+            list_file = sz.getnames()
+            list_file.pop(0)
+            return list_file
+
+
+class Tar:
+    def compress(self, target_path):
+        with tarfile.open(target_path, 'w') as t:
+            t.add("test3", recursive=True)
+    
+    def decompress(self, target_path, extract_path):
+        with tarfile.open(target_path, 'r') as t:
+            t.extractall(extract_path)
+
+    def list(self, target_path):
+        with tarfile.open(target_path, 'r') as t:
+            list_file = t.getnames()
+            list_file.pop(0)
+            return list_file
+
+
+# gzip can only compress one file, not folder
+class Gzip:
+    def compress(self, target_path):
+        with open("test4/pass.txt", "r") as f:
+            data = f.read().encode()
+        data = gzip.compress(data)
+
+        with gzip.GzipFile(target_path, 'w') as gz:
+            with open("test4/pass.txt") as f:
+                gz.write(data)
+    
+    def decompress(self, target_path, extract_path):
+        with gzip.GzipFile(target_path, 'r') as gz:
+            data = gz.read()
+            data = gzip.decompress(data).decode()
+
+        file_name = target_path.split(".gz")[0]
+        with open(extract_path + "/" + file_name, 'w') as f:
+            f.write(data)
+
+    def list(self, target_path):
+        file_name = target_path.split(".gz")[0]
+        list_file = list()
+        list_file.append(file_name)
+        return list_file
+
+
+class Targz():
+    def compress(self, target_path):
+        with tarfile.open(target_path, 'w:gz') as tgz:
+            tgz.add("test5", recursive=True)
+    
+    def decompress(self, target_path, extract_path):
+        with tarfile.open(target_path, 'r:gz') as tgz:
+            tgz.extractall(extract_path)
+
+    def list(self, target_path):
+        with tarfile.open(target_path, 'r:gz') as tgz:
+            list_file = tgz.getnames()
+            list_file.pop(0)
+            return list_file
+
+
+class Tarbz2:
+    def compress(self, target_path):
+        with tarfile.open(target_path, 'w:bz2') as tbz:
+            tbz.add("test6", recursive=True)
+    
+    def decompress(self, target_path, extract_path):
+        with tarfile.open(target_path, 'r:bz2') as tbz:
+            tbz.extractall(extract_path)
+
+    def list(self, target_path):
+        with tarfile.open(target_path, 'r:bz2') as tbz:
+            list_file = tbz.getnames()
+            list_file.pop(0)
+            return list_file
+
+
+class Tarxz:
+    def compress(self, target_path):
+        with tarfile.open(target_path, 'w:xz') as txz:
+            txz.add("test7", recursive=True)
+
+    def decompress(self, target_path, extract_path):
+        with tarfile.open(target_path, 'r:xz') as txz:
+            txz.extractall(extract_path)
+
+    def list(self, target_path):
+        with tarfile.open(target_path, 'r:xz') as txz:
+            list_file = txz.getnames()
+            list_file.pop(0)
+            return list_file
+
+
+compression_type = {
+    "application/zip": Zip(),
+    "application/x-7z-compressed": Sevenzip(),
+    "application/x-tar": Tar(),
+    "application/x-gzip": {
+        "gz": Gzip(),
+        "tgz": Targz()
+        # ".tar.gz": Targz(),
+        # ".txt.gz": Targz()
+    },
+    "application/x-bzip2": Tarbz2(),
+    "application/x-xz": Tarxz()
+}
 
 
 def getPasswordComplexity(password):
@@ -132,32 +283,64 @@ def readModifiedFile(modified_files):
 
 
 def getModifiedFile():
+    # get staged file/folder
     diff_list = os.popen("git diff --name-only --cached").read()
-    diff_list = diff_list.strip().split("\n")
+    all_files = diff_list.strip().split("\n")
 
-    exception = (
-        ".jpg",
-        ".jpeg",
-        ".png",
-        ".gif",
-        ".svg",
-        ".mp4",
-        ".mp3",
-        ".webm",
-        ".ttf",
-        ".woff",
-        ".eot",
-        ".css",
-        ".DS_Store",
-        ".pdf",
+    # create folder to store extraction
+    time_data = datetime.now()
+    fmt_date = "%Y%m%d%H%M%S"
+    extraction_path = datetime.strftime(time_data, fmt_date)
+    if not os.path.exists(extraction_path):
+        os.mkdir(extraction_path)
+
+    # extraction
+    compressed_file = dict()
+    for files in all_files:
+        file_type = magic.from_file(files, mime=True)      
+        if file_type in compression_type.keys():
+            if file_type == "application/x-gzip":
+                tgz = (".tar.gz", ".txt.gz", ".tgz")
+                gz  = (".gz")
+
+                if files.endswith(tgz):
+                    decompress = compression_type[file_type]["tgz"]
+                elif files.endswith(gz):
+                    decompress = compression_type[file_type]["gz"]
+
+            else:
+                decompress = compression_type[file_type]
+
+            decompress.decompress(files, extraction_path)
+
+            list_decompress = [extraction_path + f"/{x}" for x in decompress.list(files)]
+            for f in list_decompress:
+                compressed_file[f] = files
+
+    # remove compressed file and add its extraction to list
+    for key, vals in compressed_file.items():
+        if vals in all_files:
+            all_files.remove(vals)
+        all_files.append(key)
+
+    file_ignore = (
+        ".jpg", ".jpeg", ".png", ".gif", ".svg",
+        ".mp4", ".mp3", ".webm", ".ttf", ".woff",
+        ".eot", ".css", ".DS_Store", ".pdf",
     )
 
-    list_file = []
+    # filtering
+    filtered_file = list()
+    for files in all_files:
+        if not files.endswith(file_ignore):
+            filtered_file.append(files)
 
-    for f in diff_list:
-        if not f.endswith(exception):
-            list_file.append(f)
-
+    # use this at the end of program
+    shutil.rmtree(extraction_path)
+    
+    print(compressed_file, "\n")
+    print(filtered_file)
+    sys.exit()
     return list_file
 
 
