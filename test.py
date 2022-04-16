@@ -55,3 +55,25 @@ init()
 
 # compressed_ext  = os.path.splitext(file_name)[1]
 # compressed_name = os.path.splitext(file_name)[0]
+
+files_list = []
+for root, directories, files in os.walk("./compressed"):
+    for name in files:
+       files_list.append(os.path.join(root, name))
+# print(files_list)
+
+import gzip
+import magic
+
+with open("test2/pass.txt", "r") as f:
+    data = f.read().encode()
+
+s = gzip.compress(data)
+
+with gzip.GzipFile("asd.gz", "w") as g:
+    g.write(s)
+
+with gzip.GzipFile("asd.gz", "r") as g:
+    a = g.read()
+    b = gzip.decompress(a)
+    print(b)
