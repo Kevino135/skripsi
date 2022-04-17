@@ -434,6 +434,21 @@ def printOut(final_res, compressed_file, extraction_path):
         print("\n")
     
 
+def commitAction():
+    # header
+    print("-"*45)
+    print("| " + Back.MAGENTA + " "*13 + " COMMIT ACTION " + " "*13 + Back.RESET + " |")
+    print("-"*45)
+    
+    print("|" + " "*2 + "1." + " "*2 + "|" + " " + "Continue with encryption"       + " "*11 + "|")
+    print("|" + " "*2 + "2." + " "*2 + "|" + " " + "Continue without encryption"    + " "*8  + "|")
+    print("|" + " "*2 + "0." + " "*2 + "|" + " " + "Cancel"                         + " "*29 + "|")
+
+    # footer
+    print("|" + " "*6 + "|" + " "*36 + "|")
+    print("-"*45)
+
+
 def main():
     # create folder to store extraction
     time_data = datetime.now()
@@ -464,19 +479,16 @@ def main():
     # merge dict
     final_res = {**checkCredentials, **checkPassword}
     print("\n")
-    printOut(final_res, compressed_file, extraction_path)
 
     # use this at the end of program
     shutil.rmtree(extraction_path)
-    sys.exit()
+
     if final_res:
-        printOut(final_res)
+        printOut(final_res, compressed_file, extraction_path)
         continue_input = -1
         while continue_input < 0 or continue_input > 2:
             print("")
-            print("1. Continue with encryption")
-            print("2. Continue without encryption")
-            print("0. Cancel")
+            commitAction()
             while True:
                 try:
                     continue_input = int(input("Select [1/2/0]: "))
