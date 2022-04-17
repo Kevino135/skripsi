@@ -268,31 +268,24 @@ def readModifiedFile(modified_files):
     read_file = dict()
 
     for file in modified_files:
-        with open(file) as f:
+        with open(file, "r") as f:
             data = f.readlines()
             data = [x.replace("\n", "").strip() for x in data]
             # data = [x for x in data if x != '']
             read_file_lines[file] = data
 
     for file in modified_files:
-        with open(file) as f:
+        with open(file, "r") as f:
             datas = f.read()
             read_file[file] = datas
 
     return read_file_lines, read_file
 
 
-def getModifiedFile():
+def getModifiedFile(extraction_path):
     # get staged file/folder
     diff_list = os.popen("git diff --name-only --cached").read()
     all_files = diff_list.strip().split("\n")
-
-    # create folder to store extraction
-    time_data = datetime.now()
-    fmt_date = "%Y%m%d%H%M%S"
-    extraction_path = datetime.strftime(time_data, fmt_date)
-    if not os.path.exists(extraction_path):
-        os.mkdir(extraction_path)
 
     # extraction
     compressed_file = dict()
@@ -315,7 +308,8 @@ def getModifiedFile():
 
             list_decompress = [extraction_path + f"/{x}" for x in decompress.list(files)]
             for f in list_decompress:
-                compressed_file[f] = files
+                if os.path.isfile(f):
+                    compressed_file[f] = files
 
     # remove compressed file and add its extraction to list
     for key, vals in compressed_file.items():
@@ -334,14 +328,8 @@ def getModifiedFile():
     for files in all_files:
         if not files.endswith(file_ignore):
             filtered_file.append(files)
-
-    # use this at the end of program
-    shutil.rmtree(extraction_path)
     
-    print(compressed_file, "\n")
-    print(filtered_file)
-    sys.exit()
-    return list_file
+    return filtered_file, compressed_file
 
 
 def selectFilesToEncrypt(final_res):
@@ -421,7 +409,7 @@ def encrypt(files_to_encrypt):
         return 1
 
 
-def printOut(final_res):
+def printOut(final_res, compressed_file, extraction_path):
     os.system("cls" if platform.system().lower() == "windows" else "clear")
 
     header = " SCAN RESULT "
@@ -434,16 +422,27 @@ def printOut(final_res):
 
         for key, values in details.items():
             if key == "match":
-                print("%-12s : %s%-2s" %
-                      (key.capitalize(), Fore.LIGHTGREEN_EX, values))
+                print("%-12s : %s%-2s" % (key.capitalize(), Fore.LIGHTGREEN_EX, values))
+            elif key == "file":
+                if values in compressed_file:
+                    file_path = values.replace(extraction_path+"/", compressed_file[values] + " -> ")
+                    print("%-12s : %-2s" % (key.capitalize(), file_path))
             else:
                 print("%-12s : %-2s" % (key.capitalize(), values))
         print("\n")
-
+    
 
 def main():
+    # create folder to store extraction
+    time_data = datetime.now()
+    fmt_date = "%Y%m%d%H%M%S"
+    extraction_path = datetime.strftime(time_data, fmt_date)
+    if not os.path.exists(extraction_path):
+        os.mkdir(extraction_path)
+
+
     # list modified file from git diff
-    modified_files = getModifiedFile()
+    modified_files, compressed_file = getModifiedFile(extraction_path)
 
     # get list of regex
     with open("regex.json") as f:
@@ -463,7 +462,11 @@ def main():
     # merge dict
     final_res = {**checkCredentials, **checkPassword}
     print("\n")
+    printOut(final_res, compressed_file, extraction_path)
 
+    # use this at the end of program
+    shutil.rmtree(extraction_path)
+    sys.exit()
     if final_res:
         printOut(final_res)
         continue_input = -1
