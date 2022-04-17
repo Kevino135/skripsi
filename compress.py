@@ -88,7 +88,7 @@ class Gzip:
 class Targz():
     def compress(self, target_path):
         with tarfile.open(target_path, 'w:gz') as tgz:
-            tgz.add("test5", recursive=True)
+            tgz.add("test9", recursive=True)
     
     def decompress(self, target_path, extract_path):
         with tarfile.open(target_path, 'r:gz') as tgz:
@@ -154,7 +154,7 @@ gz = Gzip()
 # print(gz.list("test4.gz"))
 
 tgz = Targz()
-# tgz.compress("test5.tar.gz")
+# tgz.compress("test9.txt.gz")
 # tgz.decompress("test5.tar.gz", "extraction")
 # print(tgz.list("test5.tar.gz"))
 
