@@ -20,16 +20,20 @@ import py7zr
 
 
 class Zip:
-    def compress(self, target_path):
-        files_list = []
-        for root, directories, files in os.walk("test1"):
-            for name in files:
-                files_list.append(os.path.join(root, name))
-
+    def compress(self, target_path, extract_path, extraction_path):
         with zipfile.ZipFile(target_path, 'w') as z:
-            for files in files_list:
-                z.write(files)
-    
+            for path in extract_path:
+                if os.path.isfile(path):
+                    z.write(path)
+                elif os.path.isdir(path):
+                    for root, directories, files in os.walk(path):
+                        folder = root.replace(extraction_path+"/", "")
+                        for name in files:
+                            z.write(
+                                filename = os.path.join(root, name), 
+                                arcname  = os.path.join(folder, name)
+                            )
+
     def decompress(self, target_path, extract_path):
         with zipfile.ZipFile(target_path, 'r') as z:
             z.extractall(extract_path)
@@ -40,9 +44,14 @@ class Zip:
 
 
 class Sevenzip:
-    def compress(self, target_path):
+    def compress(self, target_path, extract_path, extraction_path):
         with py7zr.SevenZipFile(target_path, 'w') as sz:
-            sz.writeall("test2")
+            for path in extract_path:
+                arc_name = path.replace(extraction_path+"/", "")
+                sz.writeall(
+                    path    = path,
+                    arcname = arc_name
+                )
 
     def decompress(self, target_path, extract_path):
         with py7zr.SevenZipFile(target_path, 'r') as sz:
@@ -56,9 +65,15 @@ class Sevenzip:
 
 
 class Tar:
-    def compress(self, target_path):
+    def compress(self, target_path, extract_path, extraction_path):
         with tarfile.open(target_path, 'w') as t:
-            t.add("test3", recursive=True)
+            for path in extract_path:
+                arc_name = path.replace(extraction_path+"/", "")
+                t.add(
+                    name      = path,
+                    arcname   = arc_name,
+                    recursive = True
+                )
     
     def decompress(self, target_path, extract_path):
         with tarfile.open(target_path, 'r') as t:
@@ -73,13 +88,13 @@ class Tar:
 
 # gzip can only compress one file, not folder
 class Gzip:
-    def compress(self, target_path):
-        with open("test4/pass.txt", "r") as f:
+    def compress(self, target_path, extract_path, extraction_path):
+        with open(extract_path[0], "r") as f:
             data = f.read().encode()
         data = gzip.compress(data)
 
         with gzip.GzipFile(target_path, 'w') as gz:
-            with open("test4/pass.txt") as f:
+            with open(target_path) as f:
                 gz.write(data)
     
     def decompress(self, target_path, extract_path):
@@ -99,9 +114,15 @@ class Gzip:
 
 
 class Targz():
-    def compress(self, target_path):
+    def compress(self, target_path, extract_path, extraction_path):
         with tarfile.open(target_path, 'w:gz') as tgz:
-            tgz.add("test5", recursive=True)
+            for path in extract_path:
+                arc_name = path.replace(extraction_path+"/", "")
+                tgz.add(
+                    name      = path,
+                    arcname   = arc_name,
+                    recursive = True
+                )
     
     def decompress(self, target_path, extract_path):
         with tarfile.open(target_path, 'r:gz') as tgz:
@@ -115,9 +136,15 @@ class Targz():
 
 
 class Tarbz2:
-    def compress(self, target_path):
+    def compress(self, target_path, extract_path, extraction_path):
         with tarfile.open(target_path, 'w:bz2') as tbz:
-            tbz.add("test6", recursive=True)
+            for path in extract_path:
+                arc_name = path.replace(extraction_path+"/", "")
+                tbz.add(
+                    name      = path,
+                    arcname   = arc_name,
+                    recursive = True
+                )
     
     def decompress(self, target_path, extract_path):
         with tarfile.open(target_path, 'r:bz2') as tbz:
@@ -131,9 +158,15 @@ class Tarbz2:
 
 
 class Tarxz:
-    def compress(self, target_path):
+    def compress(self, target_path, extract_path, extraction_path):
         with tarfile.open(target_path, 'w:xz') as txz:
-            txz.add("test7", recursive=True)
+            for path in extract_path:
+                arc_name = path.replace(extraction_path+"/", "")
+                txz.add(
+                    name      = path,
+                    arcname   = arc_name,
+                    recursive = True
+                )
 
     def decompress(self, target_path, extract_path):
         with tarfile.open(target_path, 'r:xz') as txz:
@@ -343,17 +376,29 @@ def selectFilesToEncrypt(final_res):
             if file_name not in files_to_encrypt:
                 files_to_encrypt[file_name] = dict()
             files_to_encrypt[file_name]["issue {}".format(inputs)] = dict()
-            files_to_encrypt[file_name]["issue {}".format(inputs)]["match"] = final_res[
-                "issue {}".format(inputs)
-            ]["match"]
-            files_to_encrypt[file_name]["issue {}".format(inputs)]["line"] = final_res[
-                "issue {}".format(inputs)
-            ]["line"]
+            files_to_encrypt[file_name]["issue {}".format(inputs)]["match"] = final_res["issue {}".format(inputs)]["match"]
+            files_to_encrypt[file_name]["issue {}".format(inputs)]["line"] = final_res["issue {}".format(inputs)]["line"]
 
     return files_to_encrypt
 
 
-def encrypt(files_to_encrypt):
+def getCompressedPath(compressed_file):
+    compressed_path = dict()
+
+    for key, vals in compressed_file.items():
+        if vals not in compressed_path.keys():
+            compressed_path[vals] = list()
+        
+        split_file_path = key.split("/")
+        get_parent = "/".join(split_file_path[:2])
+
+        if get_parent not in compressed_path[vals]:
+            compressed_path[vals].append(get_parent)
+
+    return compressed_path
+
+
+def doEncrypt(files_to_encrypt):
     key_input = -1
     while key_input < 0 or key_input > 2:
         print("")
@@ -369,24 +414,16 @@ def encrypt(files_to_encrypt):
     if key_input == 1:
         enc_key = Fernet.generate_key()
         print("")
-        print(
-            "Key: {}\n(Save this key, it is used for encryption and decryption)".format(
-                enc_key.decode()
-            )
-        )
+        print("Key: {}\n(Save this key, it is used for encryption and decryption)".format(enc_key.decode()))
         fernet = Fernet(enc_key)
         for file_name, issues in files_to_encrypt.items():
             with open(file_name, "r") as f:
                 lines = f.read()
                 for issue in issues:
-                    encrypted_string = fernet.encrypt(
-                        issues[issue]["match"].encode())
-                    lines = lines.replace(
-                        issues[issue]["match"], encrypted_string.decode()
-                    )
+                    encrypted_string = fernet.encrypt(issues[issue]["match"].encode())
+                    lines = lines.replace(issues[issue]["match"], encrypted_string.decode())
             with open(file_name, "w") as f:
                 f.write(lines)
-        return 1
 
     elif key_input == 2:
         print("")
@@ -396,17 +433,34 @@ def encrypt(files_to_encrypt):
             with open(file_name, "r") as f:
                 lines = f.read()
                 for issue in issues:
-                    encrypted_string = fernet.encrypt(
-                        issues[issue]["match"].encode())
-                    lines = lines.replace(
-                        issues[issue]["match"], encrypted_string.decode()
-                    )
+                    encrypted_string = fernet.encrypt(issues[issue]["match"].encode())
+                    lines = lines.replace(issues[issue]["match"], encrypted_string.decode())
             with open(file_name, "w") as f:
                 f.write(lines)
-        return 1
 
     elif key_input == 0:
-        return 1
+        pass
+
+    return 1 
+
+
+def doCompress(compressed_path, extraction_path):
+    for target_path, extract_path in compressed_path.items():
+        file_type = magic.from_file(target_path, mime=True)      
+        if file_type in compression_type.keys():
+            if file_type == "application/x-gzip":
+                tgz = (".tar.gz", ".txt.gz", ".tgz")
+                gz  = (".gz")
+
+                if target_path.endswith(tgz):
+                    compress = compression_type[file_type]["tgz"]
+                elif target_path.endswith(gz):
+                    compress = compression_type[file_type]["gz"]
+
+            else:
+                compress = compression_type[file_type]
+
+            compress.compress(target_path, extract_path, extraction_path)
 
 
 def printOut(final_res, compressed_file, extraction_path):
@@ -453,6 +507,7 @@ def main():
     # create folder to store extraction
     time_data = datetime.now()
     fmt_date = "%Y%m%d%H%M%S"
+
     extraction_path = datetime.strftime(time_data, fmt_date)
     if not os.path.exists(extraction_path):
         os.mkdir(extraction_path)
@@ -462,16 +517,13 @@ def main():
     modified_files, compressed_file = getModifiedFile(extraction_path)
 
     # get list of regex
-    with open("regex.json") as f:
-        regex_creds = json.load(f)
+    with open("regex.json") as f: regex_creds = json.load(f)
 
     # read file per line and whole file
     read_file_lines, read_file = readModifiedFile(modified_files)
 
     # check creds such as api, token, private key, etc
-    checkCredentials, count_issue = isCredentials(
-        regex_creds, read_file, read_file_lines
-    )
+    checkCredentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
 
     # check creds such as password
     checkPassword = isPassword(read_file, read_file_lines, count_issue)
@@ -480,9 +532,7 @@ def main():
     final_res = {**checkCredentials, **checkPassword}
     print("\n")
 
-    # use this at the end of program
-    shutil.rmtree(extraction_path)
-
+    # commit action
     if final_res:
         printOut(final_res, compressed_file, extraction_path)
         continue_input = -1
@@ -497,12 +547,13 @@ def main():
                     print("Enter an integer")
         if continue_input == 1:
             files_to_encrypt = selectFilesToEncrypt(final_res)
-            encrypt(files_to_encrypt)
+            compressed_path  = getCompressedPath(compressed_file)
+            doEncrypt(files_to_encrypt)
+            doCompress(compressed_path, extraction_path)
         elif continue_input == 2:
             confirm = ""
             while confirm.lower() != "y" and confirm.lower() != "n":
-                confirm = input(
-                    "Confirm to continue without encryption (Y/n): ")
+                confirm = input("Confirm to continue without encryption (Y/n): ")
                 if confirm.lower() == "y":
                     return 0
                 elif confirm.lower() == "n":
@@ -511,6 +562,9 @@ def main():
             return 1
     else:
         return 0
+
+    # remove extraction path
+    shutil.rmtree(extraction_path)
 
 
 if __name__ == "__main__":
