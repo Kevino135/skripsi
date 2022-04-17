@@ -427,6 +427,8 @@ def printOut(final_res, compressed_file, extraction_path):
                 if values in compressed_file:
                     file_path = values.replace(extraction_path+"/", compressed_file[values] + " -> ")
                     print("%-12s : %-2s" % (key.capitalize(), file_path))
+                else:
+                    print("%-12s : %-2s" % (key.capitalize(), values))
             else:
                 print("%-12s : %-2s" % (key.capitalize(), values))
         print("\n")
