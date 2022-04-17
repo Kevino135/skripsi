@@ -214,7 +214,7 @@ def isPassword(read_file, read_file_lines, count_issue):
                 clean_match["issue " + str(count_issue)]["file"] = file
 
                 # get line number
-                first = read_file_lines[file].index(m) + 1
+                first = read_file_lines[file].index(m_precise) + 1
                 clean_match["issue " + str(count_issue)]["line"] = str(first)
 
                 count_issue += 1
