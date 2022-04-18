@@ -138,6 +138,10 @@ def readModifiedFile(modified_files):
 def getModifiedFile(extraction_path):
     # get staged file/folder
     diff_list = os.popen("git diff --name-only --cached").read()
+
+    if diff_list == "":
+        return None, None
+
     all_files = diff_list.strip().split("\n")
 
     # extraction
@@ -336,56 +340,66 @@ def main():
     # list modified file from git diff
     modified_files, compressed_file = getModifiedFile(extraction_path)
 
-    # get list of regex
-    with open("regex.json") as f: regex_creds = json.load(f)
-
-    # read file per line and whole file
-    read_file_lines, read_file = readModifiedFile(modified_files)
-
-    # check creds such as api, token, private key, etc
-    checkCredentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
-
-    # check creds such as password
-    checkPassword = isPassword(read_file, read_file_lines, count_issue)
-
-    # merge dict
-    final_res = {**checkCredentials, **checkPassword}
-    print("\n")
-
-    # commit action
-    if final_res:
-        printOut(final_res, compressed_file, extraction_path)
-        continue_input = -1
-        while continue_input < 0 or continue_input > 2:
-            print("")
-            commitAction()
-            while True:
-                try:
-                    continue_input = int(input("Select [1/2/0]: "))
-                    break
-                except ValueError:
-                    print("Enter an integer")
-        if continue_input == 1:
-            files_to_encrypt = selectFilesToEncrypt(final_res)
-            compressed_path  = getCompressedPath(compressed_file)
-            doEncrypt(files_to_encrypt)
-            doCompress(compressed_path, extraction_path)
-        elif continue_input == 2:
-            confirm = ""
-            while confirm.lower() != "y" and confirm.lower() != "n":
-                confirm = input("Confirm to continue without encryption (Y/n): ")
-                if confirm.lower() == "y":
-                    return 0
-                elif confirm.lower() == "n":
-                    return 1
-        elif continue_input == 0:
-            return 1
+    # exit code for scan result 
+    exit_code = 0
+    
+    if modified_files is None:
+        print("\nIt seems there is no file/directories in staged\n")
+    
     else:
-        return 0
+        # get list of regex
+        with open("regex.json") as f: regex_creds = json.load(f)
+
+        # read file per line and whole file
+        read_file_lines, read_file = readModifiedFile(modified_files)
+
+        # check creds such as api, token, private key, etc
+        checkCredentials, count_issue = isCredentials(regex_creds, read_file, read_file_lines)
+
+        # check creds such as password
+        checkPassword = isPassword(read_file, read_file_lines, count_issue)
+
+        # merge dict
+        final_res = {**checkCredentials, **checkPassword}
+        print("\n")
+
+        # commit action
+        if final_res:
+            printOut(final_res, compressed_file, extraction_path)
+            continue_input = -1
+            while continue_input < 0 or continue_input > 2:
+                print("")
+                commitAction()
+                while True:
+                    try:
+                        continue_input = int(input("Select [1/2/0]: "))
+                        break
+                    except ValueError:
+                        print("Enter an integer")
+
+            if continue_input == 1:
+                files_to_encrypt = selectFilesToEncrypt(final_res)
+                compressed_path  = getCompressedPath(compressed_file)
+                
+                exit_code = doEncrypt(files_to_encrypt)
+                doCompress(compressed_path, extraction_path)
+
+            elif continue_input == 2:
+                confirm = ""
+                while confirm.lower() != "y" and confirm.lower() != "n":
+                    confirm = input("Confirm to continue without encryption (Y/n): ")
+                    if confirm.lower() == "y":
+                        exit_code = 0
+                    elif confirm.lower() == "n":
+                        exit_code = 1
+            elif continue_input == 0:
+                exit_code = 1
+        else:
+            exit_code = 0
 
     # remove extraction path
     shutil.rmtree(extraction_path)
-
+    return exit_code
 
 if __name__ == "__main__":
     # initialize colorama init
