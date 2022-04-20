@@ -1,5 +1,5 @@
 - id: gitSanity
   name: GitSanity
   description: This hook checks for potential hard-coded credentials.
-  entry: gitSanity
+  entry: gitSanity.py
   language: python
