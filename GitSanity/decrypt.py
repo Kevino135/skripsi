@@ -3,7 +3,7 @@ import re
 import os
 import shutil
 import magic
-from GitSanity.compression import *
+from compression import *
 from cryptography.fernet import Fernet
 
 

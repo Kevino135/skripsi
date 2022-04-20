@@ -8,8 +8,9 @@ import passwordmeter
 import platform
 import sys
 import shutil
-from GitSanity.compression import *
+from compression import *
 from datetime import datetime
+import pkg_resources
 
 from cryptography.fernet import Fernet
 from colorama import init, Fore, Back, Style
@@ -348,7 +349,9 @@ def main():
     
     else:
         # get list of regex
-        with open("regex.json") as f: regex_creds = json.load(f)
+        stream = pkg_resources.resource_string(__name__, 'regex.json')
+        # with open("regex.json") as f: regex_creds = json.load(f)
+        regex_creds = json.loads(stream.decode())
 
         # read file per line and whole file
         read_file_lines, read_file = readModifiedFile(modified_files)
