@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="GitSanity",
-    version="0.1.0",
+    version="0.1.4",
     url="https://github.com/Kevino135/skripsi",
     author="Kevin Nolasco, William Suryajaya, Glenn Yohanes",
     author_email="",
@@ -13,7 +13,9 @@ setuptools.setup(
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
     include_package_data=True,
     package_data={'': ['regex.json']},
