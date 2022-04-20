@@ -1,8 +1,0 @@
-server:
-  port: ":8080"
-database:
-  tri: "sqlserver://cfu_mc94qA4igR_pssp_NMvkj7AMC0_wap_9Ad6pQdf6B_pssp_tOzNBvAREU_be:2qM11cC992zmmm-gNYgq@13.25.107.171:1433?database=PI_1&connection+timeout=80"
-
-  gath: "sqlserver://cfu_lyjAgxFzvz_pssp_B4D8pFcpMu_wap_urNESl2OMS_pssp_sNHAIVe5Vu_be:FINrJD-3MFFbsvNIbpec@54.24.23.83:1433?database=PI_2&connection+timeout=80"
-api:
-  auth: "http://auth.lam-staging/auth"
