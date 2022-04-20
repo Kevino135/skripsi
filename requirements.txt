@@ -1,0 +1,5 @@
+colorama==0.4.4
+cryptography==36.0.2
+passwordmeter==0.1.8
+py7zr==0.18.4
+python_magic==0.4.25
