@@ -373,13 +373,16 @@ def main():
             while continue_input < 0 or continue_input > 2:
                 print("")
                 commitAction()
-                sys.stdin = open("CON")
                 while True:
                     try:
                         continue_input = int(input("Select [1/2/0]: "))
                         break
                     except ValueError:
                         print("Enter an integer")
+                    except EOFError:
+                        sys.stdin.close()
+                        sys.stdin = open("con", "r")
+                        continue
 
             if continue_input == 1:
                 files_to_encrypt = selectFilesToEncrypt(final_res)
