@@ -3,7 +3,7 @@
 import re
 import os
 import json
-# import magic
+import magic
 import passwordmeter
 import platform
 import sys
