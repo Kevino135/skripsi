@@ -330,8 +330,6 @@ def commitAction():
 
 def main():
     # create folder to store extraction
-    print("Hello World")
-    return 1
     time_data = datetime.now()
     fmt_date = "%Y%m%d%H%M%S"
 
