@@ -193,7 +193,6 @@ def getModifiedFile(extraction_path):
 def selectFilesToEncrypt(final_res):
     files_to_encrypt = dict()
     print("")
-    sys.stdin = open("CON")
     issue_input = input("Enter issues number to encrypt (ex: 1,2,5): ")
     issue_input = issue_input.split(",")
     for inputs in issue_input:
@@ -233,7 +232,6 @@ def doEncrypt(files_to_encrypt):
         print("0. Cancel")
         while True:
             try:
-                sys.stdin = open("CON")
                 key_input = int(input("Select [1/2/0]: "))
                 break
             except ValueError:
@@ -254,7 +252,6 @@ def doEncrypt(files_to_encrypt):
 
     elif key_input == 2:
         print("")
-        sys.stdin = open("CON")
         enc_key = input("Enter key: ")
         fernet = Fernet(enc_key)
         for file_name, issues in files_to_encrypt.items():
@@ -376,9 +373,9 @@ def main():
             while continue_input < 0 or continue_input > 2:
                 print("")
                 commitAction()
+                sys.stdin = open("CONIN$")
                 while True:
                     try:
-                        sys.stdin = open("CON")
                         continue_input = int(input("Select [1/2/0]: "))
                         break
                     except ValueError:
@@ -394,7 +391,6 @@ def main():
             elif continue_input == 2:
                 confirm = ""
                 while confirm.lower() != "y" and confirm.lower() != "n":
-                    sys.stdin = open("CON")
                     confirm = input("Confirm to continue without encryption (Y/n): ")
                     if confirm.lower() == "y":
                         exit_code = 0
