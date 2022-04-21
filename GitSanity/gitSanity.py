@@ -373,7 +373,7 @@ def main():
             while continue_input < 0 or continue_input > 2:
                 print("")
                 commitAction()
-                sys.stdin = open("CONIN$")
+                sys.stdin = open("CON")
                 while True:
                     try:
                         continue_input = int(input("Select [1/2/0]: "))
