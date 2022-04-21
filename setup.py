@@ -17,6 +17,9 @@ setuptools.setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],
+    entry_points={
+        'console_scripts': ['gitSanity = GitSanity.gitSanity:main'],
+    },
     include_package_data=True,
     package_data={'': ['regex.json']},
 )
