@@ -1,19 +1,15 @@
-#!/usr/bin/env python3
-
 import re
 import os
 import json
 import magic
 import passwordmeter
 import platform
-import sys
 import shutil
-from compression import *
 from datetime import datetime
 import pkg_resources
 
 from cryptography.fernet import Fernet
-from colorama import init, Fore, Back, Style
+# from colorama import init, Fore, Back, Style
 
 def getPasswordComplexity(password):
     meter = passwordmeter.Meter(settings=dict(factors="length,charmix"))
@@ -145,36 +141,6 @@ def getModifiedFile(extraction_path):
 
     all_files = diff_list.strip().split("\n")
 
-    # extraction
-    compressed_file = dict()
-    for files in all_files:
-        file_type = magic.from_file(files, mime=True)      
-        if file_type in compression_type.keys():
-            if file_type == "application/x-gzip":
-                tgz = (".tar.gz", ".txt.gz", ".tgz")
-                gz  = (".gz")
-
-                if files.endswith(tgz):
-                    decompress = compression_type[file_type]["tgz"]
-                elif files.endswith(gz):
-                    decompress = compression_type[file_type]["gz"]
-
-            else:
-                decompress = compression_type[file_type]
-
-            decompress.decompress(files, extraction_path)
-
-            list_decompress = [extraction_path + f"/{x}" for x in decompress.list(files)]
-            for f in list_decompress:
-                if os.path.isfile(f):
-                    compressed_file[f] = files
-
-    # remove compressed file and add its extraction to list
-    for key, vals in compressed_file.items():
-        if vals in all_files:
-            all_files.remove(vals)
-        all_files.append(key)
-
     file_ignore = (
         ".jpg", ".jpeg", ".png", ".gif", ".svg",
         ".mp4", ".mp3", ".webm", ".ttf", ".woff",
@@ -187,7 +153,7 @@ def getModifiedFile(extraction_path):
         if not files.endswith(file_ignore):
             filtered_file.append(files)
     
-    return filtered_file, compressed_file
+    return filtered_file
 
 
 def selectFilesToEncrypt(final_res):
@@ -205,22 +171,6 @@ def selectFilesToEncrypt(final_res):
             files_to_encrypt[file_name]["issue {}".format(inputs)]["line"] = final_res["issue {}".format(inputs)]["line"]
 
     return files_to_encrypt
-
-
-def getCompressedPath(compressed_file):
-    compressed_path = dict()
-
-    for key, vals in compressed_file.items():
-        if vals not in compressed_path.keys():
-            compressed_path[vals] = list()
-        
-        split_file_path = key.split("/")
-        get_parent = "/".join(split_file_path[:2])
-
-        if get_parent not in compressed_path[vals]:
-            compressed_path[vals].append(get_parent)
-
-    return compressed_path
 
 
 def doEncrypt(files_to_encrypt):
@@ -269,63 +219,44 @@ def doEncrypt(files_to_encrypt):
     return 1 
 
 
-def doCompress(compressed_path, extraction_path):
-    for target_path, extract_path in compressed_path.items():
-        file_type = magic.from_file(target_path, mime=True)      
-        if file_type in compression_type.keys():
-            if file_type == "application/x-gzip":
-                tgz = (".tar.gz", ".txt.gz", ".tgz")
-                gz  = (".gz")
+# def printOut(final_res, compressed_file, extraction_path):
+#     os.system("cls" if platform.system().lower() == "windows" else "clear")
 
-                if target_path.endswith(tgz):
-                    compress = compression_type[file_type]["tgz"]
-                elif target_path.endswith(gz):
-                    compress = compression_type[file_type]["gz"]
+#     header = " SCAN RESULT "
 
-            else:
-                compress = compression_type[file_type]
+#     print("\n" + Back.RED + Style.BRIGHT + header)
+#     print("=" * len(header), "\n")
 
-            compress.compress(target_path, extract_path, extraction_path)
+#     for issue, details in final_res.items():
+#         print(Fore.LIGHTBLUE_EX + issue.capitalize())
 
-
-def printOut(final_res, compressed_file, extraction_path):
-    os.system("cls" if platform.system().lower() == "windows" else "clear")
-
-    header = " SCAN RESULT "
-
-    print("\n" + Back.RED + Style.BRIGHT + header)
-    print("=" * len(header), "\n")
-
-    for issue, details in final_res.items():
-        print(Fore.LIGHTBLUE_EX + issue.capitalize())
-
-        for key, values in details.items():
-            if key == "match":
-                print("%-12s : %s%-2s" % (key.capitalize(), Fore.LIGHTGREEN_EX, values))
-            elif key == "file":
-                if values in compressed_file:
-                    file_path = values.replace(extraction_path+"/", compressed_file[values] + " -> ")
-                    print("%-12s : %-2s" % (key.capitalize(), file_path))
-                else:
-                    print("%-12s : %-2s" % (key.capitalize(), values))
-            else:
-                print("%-12s : %-2s" % (key.capitalize(), values))
-        print("\n")
+#         for key, values in details.items():
+#             if key == "match":
+#                 print("%-12s : %s%-2s" % (key.capitalize(), Fore.LIGHTGREEN_EX, values))
+#             elif key == "file":
+#                 if values in compressed_file:
+#                     file_path = values.replace(extraction_path+"/", compressed_file[values] + " -> ")
+#                     print("%-12s : %-2s" % (key.capitalize(), file_path))
+#                 else:
+#                     print("%-12s : %-2s" % (key.capitalize(), values))
+#             else:
+#                 print("%-12s : %-2s" % (key.capitalize(), values))
+#         print("\n")
     
 
-def commitAction():
-    # header
-    print("-"*45)
-    print("| " + Back.MAGENTA + " "*13 + " COMMIT ACTION " + " "*13 + Back.RESET + " |")
-    print("-"*45)
+# def commitAction():
+#     # header
+#     print("-"*45)
+#     print("| " + Back.MAGENTA + " "*13 + " COMMIT ACTION " + " "*13 + Back.RESET + " |")
+#     print("-"*45)
     
-    print("|" + " "*2 + "1." + " "*2 + "|" + " " + "Continue with encryption"       + " "*11 + "|")
-    print("|" + " "*2 + "2." + " "*2 + "|" + " " + "Continue without encryption"    + " "*8  + "|")
-    print("|" + " "*2 + "0." + " "*2 + "|" + " " + "Cancel"                         + " "*29 + "|")
+#     print("|" + " "*2 + "1." + " "*2 + "|" + " " + "Continue with encryption"       + " "*11 + "|")
+#     print("|" + " "*2 + "2." + " "*2 + "|" + " " + "Continue without encryption"    + " "*8  + "|")
+#     print("|" + " "*2 + "0." + " "*2 + "|" + " " + "Cancel"                         + " "*29 + "|")
 
-    # footer
-    print("|" + " "*6 + "|" + " "*36 + "|")
-    print("-"*45)
+#     # footer
+#     print("|" + " "*6 + "|" + " "*36 + "|")
+#     print("-"*45)
 
 
 def main():
@@ -384,10 +315,8 @@ def main():
 
             if continue_input == 1:
                 files_to_encrypt = selectFilesToEncrypt(final_res)
-                compressed_path  = getCompressedPath(compressed_file)
                 
                 exit_code = doEncrypt(files_to_encrypt)
-                doCompress(compressed_path, extraction_path)
 
             elif continue_input == 2:
                 confirm = ""
@@ -408,6 +337,6 @@ def main():
 
 if __name__ == "__main__":
     # initialize colorama init
-    init(autoreset=True)
+    # init(autoreset=True)
 
     main()
