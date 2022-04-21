@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="GitSanity",
-    version="0.1.4",
+    version="0.1.5",
     url="https://github.com/Kevino135/skripsi",
     author="Kevin Nolasco, William Suryajaya, Glenn Yohanes",
     author_email="",
