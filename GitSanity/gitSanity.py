@@ -368,15 +368,17 @@ def main():
 
         # commit action
         if final_res:
-            printOut(final_res, compressed_file, extraction_path)
+#             printOut(final_res, compressed_file, extraction_path)
+            if not sys.stdin.isatty():
+                sys.stdin.close()
+                sys.stdin = open('CON:', mode='r', encoding=sys.stdin.encoding)
             continue_input = -1
             while continue_input < 0 or continue_input > 2:
                 print("")
-                commitAction()
+#                 commitAction()
+                print("Hello World")
                 while True:
                     try:
-#                         if not sys.stdin.isatty():
-#                             sys.stdin = open('CON:', mode='r', encoding=sys.stdin.encoding)
                         continue_input = int(input("Select [1/2/0]: "))
                         break
                     except ValueError:
