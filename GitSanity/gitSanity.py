@@ -375,8 +375,8 @@ def main():
                 commitAction()
                 while True:
                     try:
-                        if not sys.stdin.isatty():
-                            sys.stdin = open('CON:', mode='r', encoding=sys.stdin.encoding)
+#                         if not sys.stdin.isatty():
+#                             sys.stdin = open('CON:', mode='r', encoding=sys.stdin.encoding)
                         continue_input = int(input("Select [1/2/0]: "))
                         break
                     except ValueError:
