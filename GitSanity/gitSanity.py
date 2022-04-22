@@ -9,7 +9,7 @@ import passwordmeter
 import platform
 import sys
 import shutil
-from GitSanity.compression import *
+from compression import *
 from datetime import datetime
 import pkg_resources
 from tkinter import *
@@ -385,7 +385,7 @@ def showTkinterWindow(final_res):
                 with open(file_name, "w") as f:
                     f.write(lines)
 
-            closeRoot()
+            closeRootWithExit1()
 
 
         selectIssueWindow = Toplevel(root)
@@ -394,20 +394,38 @@ def showTkinterWindow(final_res):
         Label(selectIssueWindow, text="Enter issue numbers to encrypt (ex: 1,2,5):").grid(column=0, row=0)
         issue_numbers_var = StringVar()
         issue_numbers = Entry(selectIssueWindow, textvariable=issue_numbers_var, width=30)
-        issue_numbers.grid(column=0, row=1)
+        issue_numbers.grid(column=0, row=1, pady=10)
 
         Label(selectIssueWindow, text="Encryption Key").grid(column=0, row=2)
         encryption_key_entry = Entry(selectIssueWindow, width=30)
-        encryption_key_entry.grid(column=0, row=3)
+        encryption_key_entry.grid(column=0, row=3, pady=10)
 
         Button(selectIssueWindow, text="Generate Key", command=generateKey).grid(column=0, row=4)
-        Button(selectIssueWindow, text="Continue", command=filesToEncrypt).grid(column=0, row=5)
+        Button(selectIssueWindow, text="Continue", command=filesToEncrypt).grid(column=0, row=5, pady=10)
         Button(selectIssueWindow, text="Cancel", command=selectIssueWindow.destroy).grid(column=0, row=6)
+
+
+    def continueWithoutEncryption():
+        confirmationWindow = Toplevel(root)
+        confirmationWindow.title("Confirm")
+        confirmationWindow.geometry("200x80")
+        
+        Label(confirmationWindow, text="Are you sure?").grid(column=0, row=0, columnspan=2)
+        Button(confirmationWindow, text="Yes", command=closeRoot).grid(column=0, row=1)
+        Button(confirmationWindow, text="No", command=confirmationWindow.destroy).grid(column=1, row=1)
+
+    
+    def closeRootWithExit1():
+        global exit_code
+        exit_code = 1
+        root.destroy()
 
     
     def closeRoot():
+        global exit_code
+        exit_code = 0
         root.destroy()
-        return 1
+
 
     root = Tk()
     root.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
@@ -435,17 +453,18 @@ def showTkinterWindow(final_res):
     
     resultFrame(mainframe)
 
-    btn_encrypt = Button(mainframe, text = "Continue with encryption", command=continueWithEncryption)
+    btn_encrypt = Button(mainframe, text="Continue with encryption", command=continueWithEncryption)
     btn_encrypt.grid(column=0, row=1)
-    btn_continue = Button(mainframe, text = "Continue without encryption")
+    btn_continue = Button(mainframe, text="Continue without encryption", command=continueWithoutEncryption)
     btn_continue.grid(column=0, row=2, pady=10)
-    btn_cancel = Button(mainframe, text = "Cancel", command=closeRoot)
+    btn_cancel = Button(mainframe, text="Cancel", command=closeRootWithExit1)
     btn_cancel.grid(column=0, row=3)
 
     root.mainloop()
 
 
 def main():
+    global exit_code
     # create folder to store extraction
     time_data = datetime.now()
     fmt_date = "%Y%m%d%H%M%S"
@@ -454,12 +473,8 @@ def main():
     if not os.path.exists(extraction_path):
         os.mkdir(extraction_path)
 
-
     # list modified file from git diff
     modified_files, compressed_file = getModifiedFile(extraction_path)
-
-    # exit code for scan result 
-    exit_code = 0
     
     if modified_files is None:
         print("\nIt seems there is no file/directories in staged\n")
@@ -485,7 +500,7 @@ def main():
 
         # commit action
         if final_res:
-            exit_code = showTkinterWindow(final_res)
+            showTkinterWindow(final_res)
             # printOut(final_res, compressed_file, extraction_path)
             # continue_input = -1
             # while continue_input < 0 or continue_input > 2:
@@ -525,5 +540,6 @@ def main():
 if __name__ == "__main__":
     # initialize colorama init
     init(autoreset=True)
-
+    # exit code for scan result
+    exit_code = 0
     main()
