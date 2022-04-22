@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from functools import partial
 import re
 import os
 import json
@@ -8,10 +9,11 @@ import passwordmeter
 import platform
 import sys
 import shutil
-from GitSanity.compression import *
+from compression import *
 from datetime import datetime
 import pkg_resources
-
+from tkinter import *
+from tkinter import ttk
 from cryptography.fernet import Fernet
 from colorama import init, Fore, Back, Style
 
@@ -328,6 +330,121 @@ def commitAction():
     print("-"*45)
 
 
+def showTkinterWindow(final_res):
+    key_label = list()
+    issue_frame = list()
+
+    def resultFrame(mainframe):
+        result_frame = ttk.Frame(mainframe)
+        result_frame.grid(column=0, row=0)
+        lbl = ttk.Label(result_frame, text="Scan Result")
+        lbl.grid(column=0, row=0)
+
+        issue_count = 1
+        for issue, details in final_res.items():
+            issue_frame.append(LabelFrame(result_frame, text=issue.capitalize()))
+            issue_frame[-1].grid(column=0, row=issue_count, pady=10)
+
+            detail_count = 1
+            for key, values in details.items():
+                key_label.append(ttk.Label(issue_frame[-1], text="{} : {}".format(key.capitalize(), values)))
+                key_label[-1].grid(column=0, row=detail_count, sticky=W)
+
+                detail_count += 1
+            
+            issue_count += 1
+
+
+    def continueWithEncryption():
+
+        def generateKey():
+            enc_key = Fernet.generate_key()
+            encryption_key_entry.delete(0, END)
+            encryption_key_entry.insert(0, enc_key)
+
+
+        def filesToEncrypt():
+            files_to_encrypt = dict()
+            issue_input = [x.strip() for x in issue_numbers_var.get().split(",")]
+            for inputs in issue_input:
+                if "issue {}".format(inputs) in final_res.keys():
+                    file_name = final_res["issue {}".format(inputs)]["file"]
+                    if file_name not in files_to_encrypt:
+                        files_to_encrypt[file_name] = dict()
+                    files_to_encrypt[file_name]["issue {}".format(inputs)] = dict()
+                    files_to_encrypt[file_name]["issue {}".format(inputs)]["match"] = final_res["issue {}".format(inputs)]["match"]
+                    files_to_encrypt[file_name]["issue {}".format(inputs)]["line"] = final_res["issue {}".format(inputs)]["line"]
+
+            fernet = Fernet(encryption_key_entry.get())
+            for file_name, issues in files_to_encrypt.items():
+                with open(file_name, "r") as f:
+                    lines = f.read()
+                    for issue in issues:
+                        encrypted_string = fernet.encrypt(issues[issue]["match"].encode())
+                        lines = lines.replace(issues[issue]["match"], encrypted_string.decode())
+                with open(file_name, "w") as f:
+                    f.write(lines)
+
+            closeRoot()
+
+
+        selectIssueWindow = Toplevel(root)
+        selectIssueWindow.title("Enter issue numbers")
+
+        Label(selectIssueWindow, text="Enter issue numbers to encrypt (ex: 1,2,5):").grid(column=0, row=0)
+        issue_numbers_var = StringVar()
+        issue_numbers = Entry(selectIssueWindow, textvariable=issue_numbers_var, width=30)
+        issue_numbers.grid(column=0, row=1)
+
+        Label(selectIssueWindow, text="Encryption Key").grid(column=0, row=2)
+        encryption_key_entry = Entry(selectIssueWindow, width=30)
+        encryption_key_entry.grid(column=0, row=3)
+
+        Button(selectIssueWindow, text="Generate Key", command=generateKey).grid(column=0, row=4)
+        Button(selectIssueWindow, text="Continue", command=filesToEncrypt).grid(column=0, row=5)
+        Button(selectIssueWindow, text="Cancel", command=selectIssueWindow.destroy).grid(column=0, row=6)
+
+    
+    def closeRoot():
+        root.destroy()
+        return 1
+
+    root = Tk()
+    root.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
+    root.title("GitSanity")
+
+    # Create Container
+    container = ttk.Frame(root)
+    container.pack(fill="both", expand=True)
+
+    # Create Canvas
+    canvas = Canvas(container, height=500, width=450)
+    canvas.pack(side="left", fill="both", expand=True)
+
+    # Add Scrollbar
+    scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+    scrollbar.pack(side=RIGHT, fill=Y)
+
+    # Configure Canvas
+    canvas.configure(yscrollcommand=scrollbar.set)
+    mainframe = ttk.Frame(canvas, padding="20")
+    mainframe.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+    # Add Frame to a Window in the Canvas
+    canvas.create_window((0, 0), window=mainframe, anchor="nw")
+    
+    resultFrame(mainframe)
+
+    btn_encrypt = Button(mainframe, text = "Continue with encryption", command=continueWithEncryption)
+    btn_encrypt.grid(column=0, row=1)
+    btn_continue = Button(mainframe, text = "Continue without encryption")
+    btn_continue.grid(column=0, row=2, pady=10)
+    btn_cancel = Button(mainframe, text = "Cancel", command=closeRoot)
+    btn_cancel.grid(column=0, row=3)
+
+    root.mainloop()
+
+
 def main():
     # create folder to store extraction
     time_data = datetime.now()
@@ -368,42 +485,36 @@ def main():
 
         # commit action
         if final_res:
-            printOut(final_res, compressed_file, extraction_path)
-            if not sys.stdin.isatty():
-                sys.stdin.close()
-                sys.stdin = open('CON:', mode='r', encoding=sys.stdin.encoding)
-            continue_input = -1
-            while continue_input < 0 or continue_input > 2:
-                print("")
-                commitAction()
-                while True:
-                    try:
-                        continue_input = int(input("Select [1/2/0]: "))
-                        break
-                    except ValueError:
-                        print("Enter an integer")
-                    except EOFError:
-                        sys.stdin.close()
-                        sys.stdin = open('CON:', mode='r', encoding=sys.stdin.encoding)
-                        continue
+            exit_code = showTkinterWindow(final_res)
+            # printOut(final_res, compressed_file, extraction_path)
+            # continue_input = -1
+            # while continue_input < 0 or continue_input > 2:
+            #     print("")
+            #     commitAction()
+            #     while True:
+            #         try:
+            #             continue_input = int(input("Select [1/2/0]: "))
+            #             break
+            #         except ValueError:
+            #             print("Enter an integer")
 
-            if continue_input == 1:
-                files_to_encrypt = selectFilesToEncrypt(final_res)
-                compressed_path  = getCompressedPath(compressed_file)
+            # if continue_input == 1:
+            #     files_to_encrypt = selectFilesToEncrypt(final_res)
+            #     compressed_path  = getCompressedPath(compressed_file)
                 
-                exit_code = doEncrypt(files_to_encrypt)
-                doCompress(compressed_path, extraction_path)
+            #     exit_code = doEncrypt(files_to_encrypt)
+            #     doCompress(compressed_path, extraction_path)
 
-            elif continue_input == 2:
-                confirm = ""
-                while confirm.lower() != "y" and confirm.lower() != "n":
-                    confirm = input("Confirm to continue without encryption (Y/n): ")
-                    if confirm.lower() == "y":
-                        exit_code = 0
-                    elif confirm.lower() == "n":
-                        exit_code = 1
-            elif continue_input == 0:
-                exit_code = 1
+            # elif continue_input == 2:
+            #     confirm = ""
+            #     while confirm.lower() != "y" and confirm.lower() != "n":
+            #         confirm = input("Confirm to continue without encryption (Y/n): ")
+            #         if confirm.lower() == "y":
+            #             exit_code = 0
+            #         elif confirm.lower() == "n":
+            #             exit_code = 1
+            # elif continue_input == 0:
+            #     exit_code = 1
         else:
             exit_code = 0
 
