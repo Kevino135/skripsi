@@ -340,18 +340,23 @@ def showTkinterWindow(final_res):
         This class is independent from the widgets to be scrolled and 
         can be used to replace a standard tk.Frame
         """
-        def __init__(self, parent, width, height, window_x, window_y, **kwargs):
+        def __init__(self, parent, width, height, window_x, window_y, horizontal, **kwargs):
             Frame.__init__(self, parent, **kwargs)
             self.canvas_width  = width
             self.canvas_height = height
             self.window        = (window_x, window_y)
 
-            # The Scrollbar, layout to the right
+            # The Vertical Scrollbar, layout to the right
             vsb = Scrollbar(self, orient="vertical")
-            vsb.pack(side="right", fill="y")
+            vsb.pack(side=RIGHT, fill=Y)
+
+            if horizontal:
+                # The Horizontal Scrollbar, layout to the bottom
+                hsb = Scrollbar(self, orient="horizontal")
+                hsb.pack(side=BOTTOM, fill=X)
 
             # The Canvas which supports the Scrollbar Interface, layout to the left
-            self.canvas = Canvas(self, borderwidth=2, background="#ffffff", relief="groove",
+            self.canvas = Canvas(self, highlightthickness=0, background="#ffffff",
                                     width=self.canvas_width, height=self.canvas_height
                                 )
             self.canvas.pack(side="left", fill="both", expand=True)
@@ -360,6 +365,10 @@ def showTkinterWindow(final_res):
             # Bind the Scrollbar to the self.canvas Scrollbar Interface
             self.canvas.configure(yscrollcommand=vsb.set)
             vsb.configure(command=self.canvas.yview)
+
+            if horizontal:
+                self.canvas.configure(xscrollcommand=hsb.set)
+                hsb.configure(command=self.canvas.xview)
 
             # The Frame to be scrolled, layout into the canvas
             # All widgets to be scrolled have to use this Frame as parent
@@ -562,7 +571,16 @@ def showTkinterWindow(final_res):
                                 )
     issue_header_text.pack()
 
-    sbf_issue = ScrollbarFrame(issue_container, 150, 476, 11, 4)
+    # Create Container Issue - Content Canvas
+    issue_content = Canvas(issue_container, background="white", width=170, height=490, bd=2, relief="groove")
+    issue_content.pack_propagate(0)
+    issue_content.pack(fill='both')
+
+    # Create Container Details - Content Canvas - Frame
+    issue_content_frame = ttk.Frame(issue_content, width=160, height=480)
+    issue_content_frame.pack(fill=BOTH, pady=8, padx=8)
+
+    sbf_issue = ScrollbarFrame(issue_content_frame, 150, 480, 9, 9, False)
     sbf_issue.pack()
 
     for i in range(len(final_res)):
@@ -636,9 +654,18 @@ def showTkinterWindow(final_res):
     details_content_a_val_content.pack_propagate(0)
     details_content_a_val_content.pack(side=BOTTOM, padx=5, pady=8)
 
+    # Create Container Details - Content Canvas B
+    details_content_b = Canvas(details_commit_container, background="white", width=630, height=250, bd=2, relief="groove")
+    details_content_b.pack_propagate(0)
+    details_content_b.pack(fill='both')
+
+    # Create Container Details - Content Canvas B - Frame
+    details_content_b_key_frame = ttk.Frame(details_content_b, width=620, height=240)
+    details_content_b_key_frame.pack(fill=BOTH, pady=10, padx=8)
+
     # Create Container Details - Content Canvas B - Content
     global sbf_details
-    sbf_details = ScrollbarFrame(details_commit_container, 630, 250, 11, 4)
+    sbf_details = ScrollbarFrame(details_content_b_key_frame, 610, 240, 11, 4, True)
     sbf_details.pack()
 
     # Init Details Content
