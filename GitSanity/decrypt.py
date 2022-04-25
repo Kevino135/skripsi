@@ -3,26 +3,61 @@ import re
 import os
 import shutil
 import magic
-from compression import *
+from tkinter import *
+from tkinter import ttk
+from GitSanity.compression import *
 from cryptography.fernet import Fernet
 
 
 
-def decrypt(modified_files):
-    key = input("Please enter the key: ")
-    f = Fernet(key)
+def detectEncryptedString(modified_files):
     for files in modified_files:
-        print(files)
         with open(files, "r") as file:
-            encrypted = file.read()
-            find_string = re.findall(r"gAAAAABi.*", encrypted)
+            content = file.read()
+            if "gAAAAABi" in content:
+                return True
         
-        for string in find_string:
-            decrypted = f.decrypt(string.encode())
-            encrypted = encrypted.replace(string, decrypted.decode())
-        
-        with open(files, "w") as file:
-            file.write(encrypted)
+    return False
+
+
+def showDecryptWindow(modified_files):
+
+    def doDecrypt():
+        f = Fernet(decryption_key_entry.get())
+        for files in modified_files:
+            print(files)
+            with open(files, "r") as file:
+                encrypted = file.read()
+                find_string = re.findall(r"gAAAAABi.*", encrypted)
+            
+            for string in find_string:
+                decrypted = f.decrypt(string.encode())
+                plaintext = encrypted.replace(string, decrypted.decode())
+            
+            with open(files, "w") as file:
+                file.write(plaintext)
+
+        closeRoot()
+
+    
+    def closeRoot():
+        global exit_code
+        exit_code = 0
+        root.destroy()
+
+
+    root = Tk()
+    root.title("Decrypt")
+
+    lbl = ttk.Label(root, text="Detected encrypted string, please enter decryption key:")
+    lbl.grid(column=0, row=0)
+
+    decryption_key_entry = Entry(root, width=50)
+    decryption_key_entry.grid(column=0, row=1)
+
+    Button(root, text="Submit", command=doDecrypt).grid(column=0, row=2)
+
+    root.mainloop()
    
 
 def getModifiedFile(extraction_path):
@@ -81,17 +116,26 @@ def getModifiedFile(extraction_path):
     
     return filtered_file, compressed_file
 
+
 def main():
     time_data = datetime.now()
     fmt_date = "%Y%m%d%H%M%S"
+    
     extraction_path = datetime.strftime(time_data, fmt_date)
     if not os.path.exists(extraction_path):
         os.mkdir(extraction_path)
+
     modified_files, _ = getModifiedFile(extraction_path)
-    decrypt(modified_files)
+
+    if detectEncryptedString(modified_files):
+        showDecryptWindow(modified_files)
+
     shutil.rmtree(extraction_path)
+
+    return exit_code
 
 
 if __name__ == "__main__":
     # list modified file from git diff
+    exit_code = 0
     main()

@@ -3,3 +3,8 @@
   description: This hook checks for potential hard-coded credentials.
   entry: gitSanity
   language: python
+- id: decrypt
+  name: Decrypt
+  description: This hook checks for encrypted string and decrypts it using user provided key.
+  entry: decrypt
+  language: python
