@@ -8,7 +8,7 @@ import magic
 import passwordmeter
 import platform
 import shutil
-from compression import *
+from GitSanity.compression import *
 from datetime import datetime
 import pkg_resources
 from tkinter import *
