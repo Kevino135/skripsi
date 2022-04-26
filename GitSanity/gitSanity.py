@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 
 from functools import partial
-from lib2to3.pgen2.token import LEFTSHIFT
 import re
 import os
 import json
-from typing import final
 import magic
 import passwordmeter
 import platform
-import sys
 import shutil
 from compression import *
 from datetime import datetime
@@ -488,29 +485,58 @@ def showTkinterWindow(final_res):
 
         selectIssueWindow = Toplevel(root)
         selectIssueWindow.title("Enter issue numbers")
+        selectIssueWindow.resizable(False, False)
 
-        Label(selectIssueWindow, text="Enter issue numbers to encrypt (ex: 1,2,5):").grid(column=0, row=0)
+        tools_width = 500
+        tools_height = 300
+        center_width = int(screen_width/2) - int(tools_width/2)
+        center_height = int(screen_height/2) - int(tools_height/2)
+        selectIssueWindow.geometry(f"{tools_width}x{tools_height}+{center_width}+{center_height}")
+
+        selectIssueWindow.grid_rowconfigure(0, minsize=35)
+        selectIssueWindow.grid_columnconfigure(0, weight=1)
+
+        Label(selectIssueWindow, text="Enter issue numbers to encrypt (ex: 1,2,5):", font=('Helvetica', 11, '')).grid(column=0, row=0, sticky=S)
         issue_numbers_var = StringVar()
-        issue_numbers = Entry(selectIssueWindow, textvariable=issue_numbers_var, width=30)
+        issue_numbers = Entry(selectIssueWindow, textvariable=issue_numbers_var, width=50, font=('Helvetica', 9, ''))
         issue_numbers.grid(column=0, row=1, pady=10)
 
-        Label(selectIssueWindow, text="Encryption Key").grid(column=0, row=2)
-        encryption_key_entry = Entry(selectIssueWindow, width=30)
+        Label(selectIssueWindow, text="Encryption Key", font=('Helvetica', 11, '')).grid(column=0, row=2)
+        encryption_key_entry = Entry(selectIssueWindow, width=50, font=('Helvetica', 9, ''))
         encryption_key_entry.grid(column=0, row=3, pady=10)
 
-        Button(selectIssueWindow, text="Generate Key", command=generateKey).grid(column=0, row=4)
-        Button(selectIssueWindow, text="Continue", command=filesToEncrypt).grid(column=0, row=5, pady=10)
-        Button(selectIssueWindow, text="Cancel", command=selectIssueWindow.destroy).grid(column=0, row=6)
+        Button(selectIssueWindow, text="Generate Key", width=40,
+                font=('Helvetica', 9, ''), background="#ccc", 
+                command=generateKey).grid(column=0, row=4, pady=10)
+        Button(selectIssueWindow, text="Continue", width=40, 
+                font=('Helvetica', 9, ''), background="#ccc", 
+                command=filesToEncrypt).grid(column=0, row=5)
+        Button(selectIssueWindow, text="Cancel", width=40, 
+                font=('Helvetica', 9, ''), background="#ccc", 
+                command=selectIssueWindow.destroy).grid(column=0, row=6, pady=10)
 
 
     def continueWithoutEncryption():
         confirmationWindow = Toplevel(root)
         confirmationWindow.title("Confirm")
-        confirmationWindow.geometry("200x80")
+        confirmationWindow.resizable(False, False)
+
+        tools_width = 200
+        tools_height = 100
+        center_width = int(screen_width/2) - int(tools_width/2)
+        center_height = int(screen_height/2) - int(tools_height/2)
+        confirmationWindow.geometry(f"{tools_width}x{tools_height}+{center_width}+{center_height}")
+
+        confirmationWindow.grid_rowconfigure(0, minsize=30)
+        confirmationWindow.grid_columnconfigure(0, weight=1)
         
-        Label(confirmationWindow, text="Are you sure?").grid(column=0, row=0, columnspan=2)
-        Button(confirmationWindow, text="Yes", command=closeRoot).grid(column=0, row=1)
-        Button(confirmationWindow, text="No", command=confirmationWindow.destroy).grid(column=1, row=1)
+        Label(confirmationWindow, text="Are you sure?", width=25, font=('Helvetica', 11, '')).grid(column=0, row=0, sticky=NS)
+        Button(confirmationWindow, text="Yes", width=25, 
+                font=('Helvetica', 9, ''), background="#ccc", 
+                command=closeRoot).grid(column=0, row=1)
+        Button(confirmationWindow, text="No", width=25, 
+                font=('Helvetica', 9, ''), background="#ccc", 
+                command=confirmationWindow.destroy).grid(column=0, row=2, pady=10)
 
     
     def closeRootWithExit1():
@@ -672,9 +698,8 @@ def showTkinterWindow(final_res):
     initIssueDetails()
 
     # Create Container Commit
-    commit_container = ttk.Frame(details_commit_container, borderwidth=1, relief='groove',
-                                width=630, height=200,
-                                padding='1 1 1 1'
+    commit_container = Frame(details_commit_container, borderwidth=1, relief='groove',
+                                width=630, height=200, bg="white"
                                 )
     commit_container.pack_propagate(0)
     commit_container.pack(side=BOTTOM, fill='both')
@@ -695,11 +720,23 @@ def showTkinterWindow(final_res):
     commit_header_text.pack()
 
     # Create Container Commit - Content Canvas
-    commit_content = Canvas(commit_container, width=630, height=180, bd=1, relief="groove")
-    commit_content.pack_propagate(0)
+    commit_content = Frame(commit_container, width=630, height=180, bd=1, bg="white")
+    commit_content.pack_propagate()
     commit_content.pack()
 
     # Lanjut dari sini ...
+    btn_encrypt = Button(commit_content, text="Continue with encryption", 
+                            width=80, font=('Helvetica', 9, ''),
+                            command=continueWithEncryption)
+    btn_encrypt.grid(column=0, row=1, pady=10)
+    btn_continue = Button(commit_content, text="Continue without encryption", 
+                            width=80, font=('Helvetica', 9, ''), 
+                            command=continueWithoutEncryption)
+    btn_continue.grid(column=0, row=2)
+    btn_cancel = Button(commit_content, text="Cancel", 
+                            width=80, font=('Helvetica', 9, ''), 
+                            command=closeRootWithExit1)
+    btn_cancel.grid(column=0, row=3, pady=10)
 
 
     # Create Canvas
