@@ -120,6 +120,8 @@ def getModifiedFile(extraction_path):
 
 
 def main():
+    os.popen("git push")
+
     time_data = datetime.now()
     fmt_date = "%Y%m%d%H%M%S"
     
