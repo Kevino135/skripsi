@@ -8,7 +8,7 @@ import magic
 import passwordmeter
 import platform
 import shutil
-from GitSanity.compression import *
+from compression import *
 from datetime import datetime
 import pkg_resources
 from tkinter import *
@@ -370,6 +370,7 @@ def showTkinterWindow(final_res):
             # The Frame to be scrolled, layout into the canvas
             # All widgets to be scrolled have to use this Frame as parent
             self.scrolled_frame = Frame(self.canvas, background=self.canvas.cget('bg'))
+            self.scrolled_frame.grid_columnconfigure(0, minsize=160)
             self.canvas.create_window((self.window), window=self.scrolled_frame, anchor="nw")
 
             # Configures the scrollregion of the Canvas dynamically
@@ -603,10 +604,10 @@ def showTkinterWindow(final_res):
     issue_content.pack(fill='both')
 
     # Create Container Details - Content Canvas - Frame
-    issue_content_frame = ttk.Frame(issue_content, width=160, height=480)
-    issue_content_frame.pack(fill=BOTH, pady=8, padx=8)
+    issue_content_frame = ttk.Frame(issue_content, width=170, height=490)
+    issue_content_frame.pack(fill=BOTH, pady=4, padx=4)
 
-    sbf_issue = ScrollbarFrame(issue_content_frame, 150, 480, 9, 9, False)
+    sbf_issue = ScrollbarFrame(issue_content_frame, 170, 490, 0, 5, False)
     sbf_issue.pack()
 
     for i in range(len(final_res)):
@@ -614,7 +615,7 @@ def showTkinterWindow(final_res):
                 bd=0.5, font=('Helvetica', 9, ''),
                 width=18, activebackground="#adadad",
                 command=lambda i = i: updateIssueDetails(f"issue {str(i+1)}")
-              ).pack(pady=3)
+              ).grid(column=0, row=i+1, pady=5)
 
     # Create Container Issue - Total
     t_issue = len(final_res)
@@ -839,7 +840,8 @@ def main():
 
     # remove extraction path
     shutil.rmtree(extraction_path)
-    return exit_code
+    # return exit_code
+    return 1
 
 if __name__ == "__main__":
     # initialize colorama init
