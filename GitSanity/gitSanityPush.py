@@ -5,7 +5,7 @@ import shutil
 import magic
 from tkinter import *
 from tkinter import ttk
-from GitSanity.compression import *
+from compression import *
 from cryptography.fernet import Fernet
 
 
