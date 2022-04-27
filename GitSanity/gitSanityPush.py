@@ -5,7 +5,7 @@ import shutil
 import magic
 from tkinter import *
 from tkinter import ttk
-from compression import *
+from GitSanity.compression import *
 from cryptography.fernet import Fernet
 
 
@@ -120,7 +120,7 @@ def getModifiedFile(extraction_path):
 
 
 def main():
-    os.popen("git push")
+    os.popen("git push --no-verify")
 
     time_data = datetime.now()
     fmt_date = "%Y%m%d%H%M%S"
