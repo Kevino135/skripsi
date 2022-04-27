@@ -370,7 +370,6 @@ def showTkinterWindow(final_res):
             # The Frame to be scrolled, layout into the canvas
             # All widgets to be scrolled have to use this Frame as parent
             self.scrolled_frame = Frame(self.canvas, background=self.canvas.cget('bg'))
-            self.scrolled_frame.grid_columnconfigure(0, minsize=160)
             self.canvas.create_window((self.window), window=self.scrolled_frame, anchor="nw")
 
             # Configures the scrollregion of the Canvas dynamically
@@ -481,7 +480,43 @@ def showTkinterWindow(final_res):
                 with open(file_name, "w") as f:
                     f.write(lines)
 
-            closeRootWithExit1()
+            popupWindow = Toplevel(root)
+            popupWindow.title("Re-add and re-commit")
+            popupWindow.resizable(False, False)
+
+            tools_width = 400
+            tools_height = 200
+            center_width = int(screen_width/2) - int(tools_width/2)
+            center_height = int(screen_height/2) - int(tools_height/2)
+            popupWindow.geometry(f"{tools_width}x{tools_height}+{center_width}+{center_height}")
+
+            popupWindow.grid_rowconfigure(0, minsize=35)
+            popupWindow.grid_columnconfigure(0, weight=1)
+
+            Label(popupWindow, text="Re-add the following files and re-commit", font=('Helvetica', 11, '')).grid(column=0, row=0, sticky=S)
+            files_frame = Frame(popupWindow)
+            files_frame.grid(column=0, row=1)
+
+            files_content = Canvas(files_frame, background="white", width=200, height=100, bd=2, relief="groove")
+            files_content.pack_propagate(0)
+            files_content.pack(fill='both')
+
+            files_content_frame = ttk.Frame(files_content, width=200, height=100)
+            files_content_frame.pack(fill=BOTH, pady=4, padx=4)
+
+            sbf_files = ScrollbarFrame(files_content_frame, 200, 100, 0, 0, False)
+            sbf_files.pack()
+            sbf_files.scrolled_frame.grid_columnconfigure(0, minsize=200)
+            i = 0
+            for file_name, issues in files_to_encrypt.items():
+                Label(sbf_files.scrolled_frame, text=file_name).grid(column=0, row=i, pady=2)
+                i += 1
+            # for i in range(10):
+            #     Label(sbf_files.scrolled_frame, text=f"File {i}.txt").grid(column=0, row=i, pady=2)
+
+            Button(popupWindow, text="Finish", width=30, 
+                font=('Helvetica', 9, ''), background="#ccc", 
+                command=closeRootWithExit1).grid(column=0, row=2, pady=10)
 
 
         selectIssueWindow = Toplevel(root)
@@ -609,6 +644,7 @@ def showTkinterWindow(final_res):
 
     sbf_issue = ScrollbarFrame(issue_content_frame, 170, 490, 0, 5, False)
     sbf_issue.pack()
+    sbf_issue.scrolled_frame.grid_columnconfigure(0, minsize=160)
 
     for i in range(len(final_res)):
         Button(sbf_issue.scrolled_frame, text=f"Issue {str(i+1)} \u003E",
@@ -841,7 +877,6 @@ def main():
     # remove extraction path
     shutil.rmtree(extraction_path)
     return exit_code
-
 
 if __name__ == "__main__":
     # initialize colorama init
