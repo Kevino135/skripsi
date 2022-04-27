@@ -8,7 +8,7 @@ import magic
 import passwordmeter
 import platform
 import shutil
-from compression import *
+from GitSanity.compression import *
 from datetime import datetime
 import pkg_resources
 from tkinter import *
@@ -840,8 +840,8 @@ def main():
 
     # remove extraction path
     shutil.rmtree(extraction_path)
-    # return exit_code
-    return 1
+    return exit_code
+
 
 if __name__ == "__main__":
     # initialize colorama init
