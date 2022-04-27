@@ -22,11 +22,11 @@ def detectEncryptedString(modified_files):
     return files_containing_encrypted_string
 
 
-def showDecryptWindow(files_containing_decrypted_string):
+def showDecryptWindow(files_containing_encrypted_string):
 
     def doDecrypt():
         f = Fernet(decryption_key_entry.get())
-        for files in files_containing_decrypted_string:
+        for files in files_containing_encrypted_string:
             print(files)
             with open(files, "r") as file:
                 encrypted = file.read()
