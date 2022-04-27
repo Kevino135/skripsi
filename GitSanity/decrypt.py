@@ -11,20 +11,22 @@ from cryptography.fernet import Fernet
 
 
 def detectEncryptedString(modified_files):
+    files_containing_encrypted_string = list()
+
     for files in modified_files:
         with open(files, "r") as file:
             content = file.read()
             if "gAAAAABi" in content:
-                return True
-        
-    return False
+                files_containing_encrypted_string.append(files)
+    
+    return files_containing_encrypted_string
 
 
-def showDecryptWindow(modified_files):
+def showDecryptWindow(files_containing_decrypted_string):
 
     def doDecrypt():
         f = Fernet(decryption_key_entry.get())
-        for files in modified_files:
+        for files in files_containing_decrypted_string:
             print(files)
             with open(files, "r") as file:
                 encrypted = file.read()
@@ -125,10 +127,11 @@ def main():
     if not os.path.exists(extraction_path):
         os.mkdir(extraction_path)
 
-    modified_files, _ = getModifiedFile(extraction_path)
+    modified_files, compressed_file = getModifiedFile(extraction_path)
 
-    if detectEncryptedString(modified_files):
-        showDecryptWindow(modified_files)
+    files_containing_encrypted_string = detectEncryptedString(modified_files)
+    if files_containing_encrypted_string:
+        showDecryptWindow(files_containing_encrypted_string)
 
     shutil.rmtree(extraction_path)
 
