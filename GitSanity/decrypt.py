@@ -5,7 +5,7 @@ import shutil
 import magic
 from tkinter import *
 from tkinter import ttk
-from GitSanity.compression import *
+from compression import *
 from cryptography.fernet import Fernet
 
 
@@ -22,11 +22,11 @@ def detectEncryptedString(modified_files):
     return files_containing_encrypted_string
 
 
-def showDecryptWindow(files_containing_encrypted_string):
+def showDecryptWindow(files_containing_decrypted_string):
 
     def doDecrypt():
         f = Fernet(decryption_key_entry.get())
-        for files in files_containing_encrypted_string:
+        for files in files_containing_decrypted_string:
             print(files)
             with open(files, "r") as file:
                 encrypted = file.read()
@@ -134,6 +134,8 @@ def main():
         showDecryptWindow(files_containing_encrypted_string)
 
     shutil.rmtree(extraction_path)
+
+    os.popen("git push")
 
     return exit_code
 
