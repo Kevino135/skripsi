@@ -120,8 +120,6 @@ def getModifiedFile(extraction_path):
 
 
 def main():
-    os.popen("git push --no-verify")
-
     time_data = datetime.now()
     fmt_date = "%Y%m%d%H%M%S"
     
@@ -133,6 +131,7 @@ def main():
 
     files_containing_encrypted_string = detectEncryptedString(modified_files)
     if files_containing_encrypted_string:
+        os.popen("git push --no-verify")
         showDecryptWindow(files_containing_encrypted_string)
 
     shutil.rmtree(extraction_path)
