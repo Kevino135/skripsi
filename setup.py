@@ -18,7 +18,7 @@ setuptools.setup(
         'Programming Language :: Python :: 3.9',
     ],
     entry_points={
-        'console_scripts': ['gitSanity = GitSanity.gitSanity:main', 'decrypt = GitSanity.decrypt:main'],
+        'console_scripts': ['gitSanity = GitSanity.gitSanity:main', 'decrypt = GitSanity.decrypt:main', 'gitSanityPush = GitSanity.gitSanityPush:main'],
     },
     include_package_data=True,
     package_data={'': ['regex.json']},
