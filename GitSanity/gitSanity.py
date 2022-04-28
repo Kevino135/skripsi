@@ -330,7 +330,7 @@ def commitAction():
     print("-"*45)
 
 
-def showTkinterWindow(final_res):
+def showTkinterWindow(final_res, compressed_path, extraction_path, compressed_file):
     class ScrollbarFrame(Frame):
         """
         Extends class tk.Frame to support a scrollable Frame 
@@ -390,7 +390,14 @@ def showTkinterWindow(final_res):
         details_v_type = ttk.Label(details_content_a_val_content, text=f"  {final_res[issue]['type']}", 
                                 font=('Helvetica', 10), background="white", width=300, anchor='w')
         details_v_type.pack(pady=4)
-        details_v_file = ttk.Label(details_content_a_val_content, text=f"  {final_res[issue]['file']}", 
+
+        paths = final_res[issue]["file"]
+        if extraction_path in paths:
+            issue_path = paths.replace(extraction_path+"/", compressed_file[paths] + " -> ").replace(extraction_path+"\\", compressed_file[paths] + " -> ")            
+        else:
+            issue_path = paths
+
+        details_v_file = ttk.Label(details_content_a_val_content, text=f"  {issue_path}", 
                                 font=('Helvetica', 10), background="white", width=300, anchor='w')
         details_v_file.pack(pady=4)
         details_v_line = ttk.Label(details_content_a_val_content, text=f"  {final_res[issue]['line']}", 
@@ -415,7 +422,14 @@ def showTkinterWindow(final_res):
         details_v_type = ttk.Label(details_content_a_val_content, text=f"  {final_res[issue]['type']}", 
                                 font=('Helvetica', 10), background="white", width=300, anchor='w')
         details_v_type.pack(pady=4)
-        details_v_file = ttk.Label(details_content_a_val_content, text=f"  {final_res[issue]['file']}", 
+
+        paths = final_res[issue]["file"]
+        if extraction_path in paths:
+            issue_path = paths.replace(extraction_path+"/", compressed_file[paths] + " -> ").replace(extraction_path+"\\", compressed_file[paths] + " -> ")            
+        else:
+            issue_path = paths
+
+        details_v_file = ttk.Label(details_content_a_val_content, text=f"  {issue_path}", 
                                 font=('Helvetica', 10), background="white", width=300, anchor='w')
         details_v_file.pack(pady=4)
         details_v_line = ttk.Label(details_content_a_val_content, text=f"  {final_res[issue]['line']}", 
@@ -509,7 +523,11 @@ def showTkinterWindow(final_res):
             sbf_files.scrolled_frame.grid_columnconfigure(0, minsize=200)
             i = 0
             for file_name, issues in files_to_encrypt.items():
-                Label(sbf_files.scrolled_frame, text=file_name).grid(column=0, row=i, pady=2)
+                if extraction_path in file_name:
+                    paths = compressed_file[file_name]
+                else:
+                    paths = file_name
+                Label(sbf_files.scrolled_frame, text=paths).grid(column=0, row=i, pady=2)
                 i += 1
             # for i in range(10):
             #     Label(sbf_files.scrolled_frame, text=f"File {i}.txt").grid(column=0, row=i, pady=2)
@@ -517,6 +535,24 @@ def showTkinterWindow(final_res):
             Button(popupWindow, text="Finish", width=30, 
                 font=('Helvetica', 9, ''), background="#ccc", 
                 command=closeRootWithExit1).grid(column=0, row=2, pady=10)
+
+        def doCompress():
+            for target_path, extract_path in compressed_path.items():
+                file_type = magic.from_file(target_path, mime=True)      
+                if file_type in compression_type.keys():
+                    if file_type == "application/x-gzip":
+                        tgz = (".tar.gz", ".txt.gz", ".tgz")
+                        gz  = (".gz")
+
+                        if target_path.endswith(tgz):
+                            compress = compression_type[file_type]["tgz"]
+                        elif target_path.endswith(gz):
+                            compress = compression_type[file_type]["gz"]
+
+                    else:
+                        compress = compression_type[file_type]
+
+                    compress.compress(target_path, extract_path, extraction_path)
 
 
         selectIssueWindow = Toplevel(root)
@@ -546,7 +582,7 @@ def showTkinterWindow(final_res):
                 command=generateKey).grid(column=0, row=4, pady=10)
         Button(selectIssueWindow, text="Continue", width=40, 
                 font=('Helvetica', 9, ''), background="#ccc", 
-                command=filesToEncrypt).grid(column=0, row=5)
+                command=lambda: [filesToEncrypt(), doCompress()]).grid(column=0, row=5)
         Button(selectIssueWindow, text="Cancel", width=40, 
                 font=('Helvetica', 9, ''), background="#ccc", 
                 command=selectIssueWindow.destroy).grid(column=0, row=6, pady=10)
@@ -841,7 +877,8 @@ def main():
 
         # commit action
         if final_res:
-            showTkinterWindow(final_res)
+            compressed_path  = getCompressedPath(compressed_file)
+            showTkinterWindow(final_res, compressed_path, extraction_path, compressed_file)
             # printOut(final_res, compressed_file, extraction_path)
             # continue_input = -1
             # while continue_input < 0 or continue_input > 2:
@@ -872,6 +909,7 @@ def main():
             # elif continue_input == 0:
             #     exit_code = 1
         else:
+            print("\nNo hardcoded credentials detected in your repository\n")
             exit_code = 0
 
     # remove extraction path
