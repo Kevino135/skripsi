@@ -1,5 +1,5 @@
 ## Installation
-1. Install pre-commit from https://pre-commit.com/#install
+1. Install pre-commit by following the instructions on https://pre-commit.com/#install
 2. Create `.pre-commit-config.yaml` in your repository with the following content:
 
    ```
@@ -15,7 +15,6 @@
          - id: gitSanityPush
            stages: [push]
    ```
-   
 3. Run `pre-commit install` in your repository
 
 ## Pre-commit hook
