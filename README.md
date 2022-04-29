@@ -15,17 +15,18 @@
          - id: gitSanityPush
            stages: [push]
    ```
+   
 3. Run `pre-commit install` in your repository
 
 ## Pre-commit hook
 If the tool detects a potential credential, a window will popup
 User can choose to
 1. Continue with encryption
-> If user chooses to continue with encryption, user will be prompted to enter an encryption key and select which issues to encrypt.
-3. Continue without encryption
-> If user chooses to continue without encryption, user will be prompted to confirm.
-5. Cancel
-> If user chooses to cancel, program exits with exit code 1.
+   > If user chooses to continue with encryption, user will be prompted to enter an encryption key and select which issues to encrypt.
+2. Continue without encryption
+   > If user chooses to continue without encryption, user will be prompted to confirm.
+3. Cancel
+   > If user chooses to cancel, program exits with exit code 1.
 
 ## Pre-push hook
 The tool pushes the commit, then
