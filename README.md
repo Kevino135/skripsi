@@ -1,6 +1,7 @@
 ## Installation
 1. Install pre-commit from https://pre-commit.com/#install
 2. Create `.pre-commit-config.yaml` in your repository with the following content:
+
    ```
    repos:
      - repo: https://github.com/Kevino135/skripsi
@@ -20,12 +21,11 @@
 If the tool detects a potential credential, a window will popup
 User can choose to
 1. Continue with encryption
-2. Continue without encryption
-3. Cancel
-
-If user chooses to continue with encryption, user will be prompted to enter an encryption key and select which issues to encrypt.
-If user chooses to continue without encryption, user will be prompted to confirm.
-If user chooses to cancel, program exits with exit code 1.
+> If user chooses to continue with encryption, user will be prompted to enter an encryption key and select which issues to encrypt.
+3. Continue without encryption
+> If user chooses to continue without encryption, user will be prompted to confirm.
+5. Cancel
+> If user chooses to cancel, program exits with exit code 1.
 
 ## Pre-push hook
 The tool pushes the commit, then
