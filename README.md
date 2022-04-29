@@ -28,10 +28,9 @@ User can choose to
    > If user chooses to cancel, program exits with exit code 1.
 
 ## Pre-push hook
-The tool pushes the commit, then
-The tool scans all files in the repository, if it detects an encrypted string (fernet), a window will popup
+The tool pushes the commit, then scans all files in the repository, if it detects an encrypted string (fernet), a window will popup.
 User will be prompted to input the decryption key (same key used for encryption)
 
 ## Post-merge hook
-The tool scans all files in the repository, if it detects an encrypted string (fernet), a window will popup
+The tool scans all files in the repository, if it detects an encrypted string (fernet), a window will popup.
 User will be prompted to input the decryption key (same key used for encryption)
