@@ -7,6 +7,7 @@ import passwordmeter
 import pkg_resources
 from tkinter import *
 from tkinter import ttk
+import platform
 from cryptography.fernet import Fernet
 
 
@@ -204,13 +205,26 @@ def showTkinterWindow(final_res):
             self.scrolled_frame.bind("<Leave>", self._unbound_to_mousewheel)
         
         def _bound_to_mousewheel(self, event):
-            self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+            if platform.system() == "Linux":
+                self.canvas.bind_all("<Button-4>", self._on_mousewheel)
+                self.canvas.bind_all("<Button-5>", self._on_mousewheel)
+            else:
+                self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
 
         def _unbound_to_mousewheel(self, event):
-            self.canvas.unbind_all("<MouseWheel>")
+            if platform.system() == "Linux":
+                self.canvas.unbind_all("<Button-4>")
+                self.canvas.unbind_all("<Button-5>")
+            else:
+                self.canvas.unbind_all("<MouseWheel>")
 
         def _on_mousewheel(self, event):
-            self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+            if platform.system() == "Darwin":
+                delta = event.delta
+            else:
+                delta = event.delta//120
+                
+            self.canvas.yview_scroll(int(-1*(delta)), "units")
 
         def on_configure(self, event):
             """Set the scroll region to encompass the scrolled frame"""
