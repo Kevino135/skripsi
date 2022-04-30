@@ -1,6 +1,6 @@
 ## Installation
 1. Install pre-commit by following the instructions on https://pre-commit.com/#install
-2. Create `.pre-commit-config.yaml` in your repository with the following content:
+2. Create `.pre-commit-config.yaml` in your local root repository with the following content:
 
    ```
    repos:
@@ -15,7 +15,7 @@
          - id: gitSanityPush
            stages: [push]
    ```
-3. Run `pre-commit install` in your repository
+3. Run `pre-commit install --install-hooks -t pre-commit -t post-merge -t pre-push` in your repository via CLI
 
 ## Pre-commit hook
 If the tool detects a potential credential, a window will popup
