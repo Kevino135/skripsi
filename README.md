@@ -16,6 +16,7 @@
            stages: [push]
    ```
 3. Run `pre-commit install -t pre-commit -t post-merge -t pre-push` in your repository via CLI
+4. Run `curl -s https://raw.githubusercontent.com/Kevino135/skripsi/tkinter2/quiet.py | python -`
 
 ## Pre-commit hook
 If the tool detects a potential credential, a window will popup
