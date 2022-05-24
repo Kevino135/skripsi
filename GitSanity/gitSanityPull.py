@@ -85,7 +85,8 @@ def getModifiedFile():
 
 
 def main():
-
+    global exit_code
+    exit_code = 0
     modified_files = getModifiedFile()
 
     files_containing_encrypted_string = detectEncryptedString(modified_files)
