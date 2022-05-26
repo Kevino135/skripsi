@@ -27,10 +27,10 @@ def showDecryptWindow(files_containing_encrypted_string):
                 encrypted = file.read()
                 find_string = re.findall(r"gAAAAABi.*", encrypted)
             
-            plaintext = encrypted
-            for string in find_string:
-                decrypted = f.decrypt(string.encode())
-                plaintext = plaintext.replace(string, decrypted.decode())
+                plaintext = encrypted
+                for string in find_string:
+                    decrypted = f.decrypt(string.encode())
+                    plaintext = plaintext.replace(string, decrypted.decode())
             
             with open(files, "w") as file:
                 file.write(plaintext)
