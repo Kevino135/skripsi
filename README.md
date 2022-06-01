@@ -16,7 +16,7 @@
            stages: [push]
    ```
 3. Run `pre-commit install -t pre-commit -t post-merge -t pre-push` in your repository via CLI
-4. Run `pre-commit autoupdate --bleeding-edge --repo https://github.com/Kevino135/skripsi`
+4. Run `pre-commit autoupdate --repo https://github.com/Kevino135/skripsi`
 
 ## Pre-commit hook
 If the tool detects a potential credential, a window will popup
