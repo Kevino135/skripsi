@@ -11,6 +11,12 @@ import platform
 from cryptography.fernet import Fernet
 
 
+def index_containing_substring(the_list, substring):
+    for i, s in enumerate(the_list):
+        if substring in s:
+              return i
+    return -1
+
 
 def getPasswordComplexity(password):
     meter = passwordmeter.Meter(settings=dict(factors="length,charmix"))
@@ -105,7 +111,7 @@ def isCredentials(regex_creds, read_file, read_file_lines):
                         "line"
                     ] = f"{first} - {last}"
                 else:
-                    first = read_file_lines[file].index(m) + 1
+                    first = index_containing_substring(read_file_lines[file], m) + 1
                     clean_match["issue " +
                                 str(count_issue)]["line"] = str(first)
 
