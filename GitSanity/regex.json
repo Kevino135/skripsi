@@ -30,13 +30,8 @@
     "Generic Secret": "[sS][eE][cC][rR][eE][tT].*['|\"][0-9a-zA-Z]{32,45}['|\"]",
 
     "Google API Key": "AIza[0-9A-Za-z\\-_]{35}",
-    "Google Cloud Platform API Key": "(?i)(google|gcp|youtube|drive|yt)(.{0,20})?['\"][AIza[0-9a-z\\-_]{35}]['\"]",
     "Google Cloud Platform OAuth": "[0-9]+-[0-9A-Za-z_]{32}\\.apps\\.googleusercontent\\.com",
-    "Google Drive API Key": "AIza[0-9A-Za-z\\-_]{35}",
-    "Google Drive OAuth": "[0-9]+-[0-9A-Za-z_]{32}\\.apps\\.googleusercontent\\.com",
     "Google (GCP) Service-account": "\"type\": \"service_account\"",
-    "Google Gmail API Key": "AIza[0-9A-Za-z\\-_]{35}",
-    "Google Gmail OAuth": "[0-9]+-[0-9A-Za-z_]{32}\\.apps\\.googleusercontent\\.com",
     "Google OAuth Access Token": "ya29\\.[0-9A-Za-z\\-_]+",
 
     "Heroku API Key": "[hH][eE][rR][oO][kK][uU].*[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}",
