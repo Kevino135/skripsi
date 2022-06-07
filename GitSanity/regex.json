@@ -10,8 +10,6 @@
     "Amazon MWS Auth Token": "amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
     "AWS AppSync GraphQL Key": "da2-[a-z0-9]{26}",
 
-    "Facebook Client ID": "(?i)(facebook|fb)(.{0,20})?['\"][0-9]{13,17}"
-
     "GitHub": "ghp_[0-9a-zA-Z]{36}",
 
     "Generic API Key": "[aA][pP][iI]_?[kK][eE][yY].*['|\"][0-9a-zA-Z]{32,45}['|\"]",
@@ -27,7 +25,7 @@
 
     "JSON Web Token": "^([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_\\-\\+\\/=]*)",
 
-    "MailChamp API Key": "[0-9a-f]{32}-us[0-9]{1,2}",
+    "MailChimp API Key": "[0-9a-f]{32}-us[0-9]{1,2}",
     "Mailgun API Key": "key-[0-9a-zA-Z]{32}",
     "Mailto": "(?<=mailto:)[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9.-]+",
 
