@@ -10,9 +10,6 @@
     "SQL Server Connection String": ".*\"?sqlserver:\/\/.*:.*@.*\"?",
     "PostgreSQL Connection String": ".*\"?postgresql:\/\/.*:.*@.*\"?",
 
-    "Artifactory API Token": "(?:\\s|=|:|\"|^)AKC[a-zA-Z0-9]{10,}",
-    "Artifactory Password": "(?:\\s|=|:|\"|^)AP[\\dABCDEF][a-zA-Z0-9]{8,}",
-
     "AWS API Key": "((?:A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16})",
     "Amazon MWS Auth Token": "amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
     "AWS AppSync GraphQL Key": "da2-[a-z0-9]{26}",
@@ -20,9 +17,7 @@
     "Basic Auth Credentials": "(?<=:\\\/\\\/)[a-zA-Z0-9]+:[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z]+",
     "Cloudinary Basic Auth": "cloudinary:\\\/\\\/[0-9]{15}:[0-9A-Za-z]+@[a-z]+",
 
-    "Facebook Access Token": "EAACEdEose0cBA[0-9A-Za-z]+",
-    "Facebook Client ID": "(?i)(facebook|fb)(.{0,20})?['\"][0-9]{13,17}",
-    "Facebook Oauth": "[f|F][a|A][c|C][e|E][b|B][o|O][o|O][k|K].*['|\"][0-9a-f]{32}['|\"]",
+    "Facebook Client ID": "(?i)(facebook|fb)(.{0,20})?['\"][0-9]{13,17}"
 
     "GitHub": "ghp_[0-9a-zA-Z]{36}",
 
@@ -36,8 +31,6 @@
 
     "Heroku API Key": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
     "Heroku OAuth": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
-
-    "Instagram OAuth": "[0-9a-fA-F]{7}.[0-9a-fA-F]{32}",
 
     "JSON Web Token": "^([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_=]+)\\.([a-zA-Z0-9_\\-\\+\\/=]*)",
 
