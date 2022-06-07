@@ -46,8 +46,6 @@
 
     "Telegram Bot API Key": "[0-9]{8,10}:[a-zA-Z0-9_\\-]{35}",
     "Twilio API Key": "SK[0-9a-fA-F]{32}",
-    "Twitter Access Token": "[tT][wW][iI][tT][tT][eE][rR].*[1-9][0-9]+-[0-9a-zA-Z]{40}",
-    "Twitter OAuth": "[tT][wW][iI][tT][tT][eE][rR].*['|\"][0-9a-zA-Z]{35,44}['|\"]",
 
     "Vault Token": "[sb]\\.[a-zA-Z0-9]{24}"
 }
