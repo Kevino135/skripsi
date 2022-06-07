@@ -14,9 +14,6 @@
     "Amazon MWS Auth Token": "amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
     "AWS AppSync GraphQL Key": "da2-[a-z0-9]{26}",
 
-    "Basic Auth Credentials": "(?<=:\\\/\\\/)[a-zA-Z0-9]+:[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z]+",
-    "Cloudinary Basic Auth": "cloudinary:\\\/\\\/[0-9]{15}:[0-9A-Za-z]+@[a-z]+",
-
     "Facebook Client ID": "(?i)(facebook|fb)(.{0,20})?['\"][0-9]{13,17}"
 
     "GitHub": "ghp_[0-9a-zA-Z]{36}",
