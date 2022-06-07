@@ -5,10 +5,6 @@
     "SSH (EC) private key": "-----BEGIN EC PRIVATE KEY-----[A-Za-z\/+=\n0-9]+-----BEGIN EC PRIVATE KEY-----",
     "PGP private key block": "-----BEGIN PGP PRIVATE KEY BLOCK-----[A-Za-z\/+=\n0-9]+-----BEGIN PGP PRIVATE KEY BLOCK-----",
     "SSL/TLS Certificate": "-----BEGIN CERTIFICATE-----[A-Za-z\/+=\n0-9]+-----END CERTIFICATE-----",
-    
-    "MySQL/MariaDB Connection String": ".*\"?.*:.*@tcp\\(.*\\)\/.*\"?",
-    "SQL Server Connection String": ".*\"?sqlserver:\/\/.*:.*@.*\"?",
-    "PostgreSQL Connection String": ".*\"?postgresql:\/\/.*:.*@.*\"?",
 
     "AWS API Key": "((?:A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16})",
     "Amazon MWS Auth Token": "amzn\\.mws\\.[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
