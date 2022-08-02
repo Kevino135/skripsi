@@ -5,7 +5,7 @@
    ```
    repos:
      - repo: https://github.com/Kevino135/skripsi
-       rev: 0.1.9.3
+       rev: 0.1.9.8
        hooks:
          - id: gitSanity
            stages: [commit]
