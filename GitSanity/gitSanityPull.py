@@ -25,7 +25,7 @@ def showDecryptWindow(files_containing_encrypted_string):
         for files in files_containing_encrypted_string:
             with open(files, "r") as file:
                 encrypted = file.read()
-                find_string = re.findall(r"gAAAAABi.*", encrypted)
+                find_string = re.findall(r"gAAAAABi.*[\w=]$", encrypted)
             
             plaintext = encrypted
             for string in find_string:
