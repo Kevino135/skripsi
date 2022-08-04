@@ -144,7 +144,7 @@ def getModifiedFile():
     diff_list = os.popen("git diff --name-only --cached").read()
 
     if diff_list == "":
-        return None, None
+        return None
 
     all_files = diff_list.strip().split("\n")
 
