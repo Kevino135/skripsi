@@ -164,11 +164,6 @@ def getModifiedFile():
 
 def showTkinterWindow(final_res):
     class ScrollbarFrame(Frame):
-        """
-        Extends class tk.Frame to support a scrollable Frame 
-        This class is independent from the widgets to be scrolled and 
-        can be used to replace a standard tk.Frame
-        """
         def __init__(self, parent, width, height, window_x, window_y, horizontal, **kwargs):
             Frame.__init__(self, parent, **kwargs)
             self.canvas_width  = width
