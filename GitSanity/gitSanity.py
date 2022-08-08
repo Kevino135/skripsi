@@ -98,15 +98,14 @@ def isCredentials(regex_creds, read_file, read_file_lines):
                 clean_match["issue " + str(count_issue)]["match"] = m
                 clean_match["issue " + str(count_issue)]["file"] = file
 
-                print(regex_type)
                 # get line number
                 if (
                     "private" in regex_type.lower()
                     or "certificate" in regex_type.lower()
-                    or "Google (GCP) Service-account"
+                    or "Google (GCP) Service-account" in regex_type
                 ):
                     header = m.split("\n")[1]
-                    first = (read_file_lines[file].index(header) + 1) - 1
+                    first = (read_file_lines[file].index(header.strip()) + 1) - 1
                     last = first + len(m.split("\n")) - 1
                     clean_match["issue " + str(count_issue)][
                         "line"
