@@ -98,6 +98,7 @@ def isCredentials(regex_creds, read_file, read_file_lines):
                 clean_match["issue " + str(count_issue)]["match"] = m
                 clean_match["issue " + str(count_issue)]["file"] = file
 
+                print(regex_type)
                 # get line number
                 if (
                     "private" in regex_type.lower()
