@@ -102,7 +102,7 @@ def isCredentials(regex_creds, read_file, read_file_lines):
                 if (
                     "private" in regex_type.lower()
                     or "certificate" in regex_type.lower()
-                    or "service-account" in regex_type.lower()
+                    or "Google (GCP) Service-account"
                 ):
                     header = m.split("\n")[1]
                     first = (read_file_lines[file].index(header) + 1) - 1
